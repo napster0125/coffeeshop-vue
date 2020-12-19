@@ -74,6 +74,7 @@
 }
 #header-menu div {
   padding-left: 10px;
+  text-align: center;
 }
 #header-account {
   background-color: white;

@@ -5,16 +5,16 @@
         <b-link v-on:click="getProduct()">Favourite</b-link>
       </div>
       <div id="cof">
-        <b-link v-on:click="getProductCat1()">Coffee</b-link>
+        <b-link v-on:click="getProductByCat(1)">Coffee</b-link>
       </div>
       <div id="noncof">
-        <b-link v-on:click="getProductCat2()">Non Coffee</b-link>
+        <b-link v-on:click="getProductByCat(2)">Non Coffee</b-link>
       </div>
       <div id="food">
-        <b-link v-on:click="getProductCat3()">Foods</b-link>
+        <b-link v-on:click="getProductByCat(3)">Foods</b-link>
       </div>
       <div id="addon">
-        <b-link v-on:click="getProductCat4()">Add On</b-link>
+        <b-link v-on:click="getProductByCat(4)">Add On</b-link>
       </div>
     </div>
     <b-container class="bv-example-row">
@@ -27,7 +27,7 @@
           v-for="(item, index) in products"
           :key="index"
         >
-          <div id="productCard">
+          <div id="productCard" @click="detailProduct(item.product_id)">
             <img src="@/assets/cold.png" style="border-radius: 50%;" />
             <p id="name">{{ item.product_name }}</p>
             <p id="price">IDR {{ item.product_price }}</p>
@@ -62,13 +62,17 @@ export default {
   name: 'ProductCard',
   data() {
     return {
-      products: []
+      products: [],
+      category: ''
     }
   },
   created() {
     this.getProduct()
   },
   methods: {
+    detailProduct(product_id) {
+      this.$router.push({ name: 'ProductDetail', params: { id: product_id } })
+    },
     getProduct() {
       axios
         .get('http://localhost:3000/product?page=1&limit=8')
@@ -80,42 +84,9 @@ export default {
           console.log(error)
         })
     },
-    getProductCat1() {
+    getProductByCat(id) {
       axios
-        .get('http://localhost:3000/product?page=1&limit=8&category=1')
-        .then(response => {
-          console.log(response)
-          this.products = response.data.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
-    getProductCat2() {
-      axios
-        .get('http://localhost:3000/product?page=1&limit=8&category=2')
-        .then(response => {
-          console.log(response)
-          this.products = response.data.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
-    getProductCat3() {
-      axios
-        .get('http://localhost:3000/product?page=1&limit=8&category=3')
-        .then(response => {
-          console.log(response)
-          this.products = response.data.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
-    getProductCat4() {
-      axios
-        .get('http://localhost:3000/product?page=1&limit=8&category=4')
+        .get(`http://localhost:3000/product?page=1&limit=8&category=${id}`)
         .then(response => {
           console.log(response)
           this.products = response.data.data
@@ -130,8 +101,8 @@ export default {
 
 <style scoped>
 #productCard {
-  width: 156px;
-  height: 212.41px;
+  width: 140px;
+  height: 200px;
   margin-left: 50px;
   margin-top: 60px;
   text-align: center;
@@ -143,8 +114,8 @@ export default {
   position: relative;
   left: 0;
   top: -50px;
-  width: 140px;
-  height: 140px;
+  width: 120px;
+  height: 120px;
 }
 #productCard p {
   position: relative;
