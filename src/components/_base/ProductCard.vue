@@ -17,6 +17,12 @@
         <b-link v-on:click="getProduct(4)">Add On</b-link>
       </div>
     </div>
+    <div>
+      Sort :
+      <button @click="sort('product_name')">By Name</button>
+      <button @click="sort('product_price')">By Price</button>
+      <button @click="sort('product_created_at')">By Date Added</button>
+    </div>
     <b-container class="bv-example-row">
       <b-row>
         <b-col
@@ -63,9 +69,11 @@ export default {
       category: '',
       currentPage: 1,
       totalRows: null,
-      limit: 6,
+      limit: 5,
       page: 1,
       activePage: 0,
+      isSorted: 0,
+      sortType: '',
       bold: 'color : black;',
       normal: ' '
     }
@@ -74,6 +82,39 @@ export default {
     this.getProduct()
   },
   methods: {
+    sort(param) {
+      if (this.activePage) {
+        axios
+          .get(
+            `http://localhost:3000/product?page=${this.page}&limit=${this.limit}&category=${this.activePage}&sort=${param}`
+          )
+          .then(response => {
+            console.log(response)
+            this.products = response.data.data
+            this.totalRows = response.data.pagination.totalData
+            this.isSorted = 1
+            this.sortType = param
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      } else {
+        axios
+          .get(
+            `http://localhost:3000/product?page=${this.page}&limit=${this.limit}&sort=${param}`
+          )
+          .then(response => {
+            console.log(response)
+            this.products = response.data.data
+            this.totalRows = response.data.pagination.totalData
+            this.isSorted = 1
+            this.sortType = param
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      }
+    },
     detailProduct(product_id) {
       this.$router.push({ name: 'ProductDetail', params: { id: product_id } })
     },
@@ -88,6 +129,8 @@ export default {
             this.totalRows = response.data.pagination.totalData
             this.products = response.data.data
             this.activePage = id
+            this.isSorted = 0
+            this.sortType = null
           })
           .catch(error => {
             console.log(error)
@@ -102,6 +145,8 @@ export default {
             this.totalRows = response.data.pagination.totalData
             this.products = response.data.data
             this.activePage = 0
+            this.isSorted = 0
+            this.sortType = null
           })
           .catch(error => {
             console.log(error)
@@ -110,10 +155,20 @@ export default {
     },
     handlePageChange(numberPage) {
       this.page = numberPage
-      if (this.activePage) {
-        this.getProduct(this.activePage)
-      } else {
-        this.getProduct()
+      if (this.isSorted === 0) {
+        if (this.activePage) {
+          this.getProduct(this.activePage)
+        } else {
+          this.getProduct()
+        }
+      } else if (this.isSorted === 1) {
+        if (this.sortType == 'product_name') {
+          this.sort('product_name')
+        } else if (this.sortType == 'product_price') {
+          this.sort('product_price')
+        } else if (this.sortType == 'product_created_at') {
+          this.sort('product_created_at')
+        }
       }
     }
   }
@@ -132,7 +187,7 @@ export default {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 #productCard:hover {
-  background-color: lightgray;
+  background-color: wheat;
   border: black 2px solid;
 }
 #productCard img {

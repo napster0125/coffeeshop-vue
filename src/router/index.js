@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Product from '../views/Product.vue'
 import Lifecycle from '../views/Lifecycle.vue'
 import ProductDetail from '../views/productDetail.vue'
+import Cart from '../views/cart.vue'
 
 Vue.use(VueRouter)
 
@@ -22,6 +23,11 @@ const routes = [
     path: '/productDetail/:id',
     name: 'ProductDetail',
     component: ProductDetail
+  },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: Cart
   },
   {
     path: '/lifecycle',

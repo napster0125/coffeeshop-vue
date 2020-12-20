@@ -11,6 +11,7 @@
         </b-col>
       </b-row>
     </b-container>
+    <Footer />
   </div>
 </template>
 
@@ -18,6 +19,7 @@
 import Navbar from '../components/_base/Navbar'
 import ProductCard from '../components/_base/ProductCard'
 import Coupon from '../components/_base/coupon'
+import Footer from '../components/_base/footer'
 // import axios from 'axios'
 
 export default {
@@ -25,29 +27,9 @@ export default {
   components: {
     Navbar,
     ProductCard,
-    Coupon
+    Coupon,
+    Footer
   }
-  // data() {
-  //   return {
-  //     products: []
-  //   }
-  // },
-  // created() {
-  //   this.getProduct()
-  // }
-  // methods: {
-  //   getProduct() {
-  //     axios
-  //       .get('http://localhost:3000/product?page=1&limit=8')
-  //       .then(response => {
-  //         console.log(response)
-  //         this.products = response.data.data
-  //       })
-  //       .catch(error => {
-  //         console.log(error)
-  //       })
-  //   }
-  // }
 }
 </script>
 

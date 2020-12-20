@@ -14,14 +14,23 @@
             <div class="one"><img src="@/assets/img29.png" /></div>
             <div class="two">
               <div class="atas">
-                Beef Spaghetti
+                {{ couponData[couponArr].coupon_name }}
               </div>
               <div class="bawah">
-                20% OFF
+                Discounted : IDR {{ couponData[couponArr].coupon_price }}
               </div>
             </div>
             <div class="three">
-              Buy 1 Choco Oreo and get 20% off for Beef Spaghetti
+              {{ couponData[couponArr].coupon_desc }}
+            </div>
+            <br />
+            <div id="changeCoupon">
+              <button v-show="couponArr > 0" @click="couponArr -= 1">
+                Prev Coupon
+              </button>
+              <button v-show="couponArr < 2" @click="couponArr += 1">
+                Next Coupon
+              </button>
             </div>
           </div>
           <div class="bottom">
@@ -29,10 +38,10 @@
               Coupon Code
             </div>
             <div class="two">
-              FNPR15RG
+              {{ couponData[couponArr].coupon_code }}
             </div>
             <div class="three">
-              Valid untill October 10th 2020
+              Valid untill {{ couponData[couponArr].end_date }}
             </div>
           </div>
         </div>
@@ -50,11 +59,48 @@
     </div>
   </div>
 </template>
+<script>
+import axios from 'axios'
+export default {
+  name: 'coupon',
+  data() {
+    return {
+      couponArr: 0,
+      couponData: []
+    }
+  },
+  //   computed: {
+  //     nextCoupon() {
+  //       return (couponArr = 1)
+  //     }
+  //   },
+  created() {
+    this.getCoupon()
+  },
+  methods: {
+    getCoupon() {
+      axios
+        .get(`http://localhost:3000/coupon`)
+        .then(response => {
+          this.couponData = response.data.data
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    }
+  }
+}
+</script>
+
 <style scoped>
 .main-promo {
   border-right: #f8f8f8 solid 5px;
   /* height: 1005px; */
   background-color: white;
+}
+#changeCoupon button {
+  background-color: wheat;
+  font-family: 'arial';
 }
 .line1 {
   color: #6a4029;

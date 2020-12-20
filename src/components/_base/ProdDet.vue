@@ -51,21 +51,64 @@
           <div class="line4">
             <form>
               <div class="form-group">
-                <select class="custom-select">
-                  <option selected>Select Size</option>
+                <select
+                  class="custom-select"
+                  v-show="products[0].size_id === 1"
+                  v-model="form.size_choice"
+                >
+                  <option value="0" disabled selected>Select Size</option>
                   <option value="1">R</option>
                   <option value="2">L</option>
                   <option value="3">XL</option>
+                </select>
+                <select
+                  class="custom-select"
+                  v-show="products[0].size_id === 2"
+                  v-model="form.size_choice"
+                >
+                  <option value="0" disabled selected>Select Size</option>
+                  <option value="4">250 Grams</option>
+                  <option value="5">300 Grams</option>
+                  <option value="6">500 Grams</option>
                 </select>
               </div>
             </form>
             <form>
               <div class="form-group">
-                <select class="custom-select">
-                  <option selected>Select Delivery Method</option>
-                  <option value="1">Gojek</option>
-                  <option value="2">Gran</option>
-                  <option value="3">Take Away</option>
+                <select class="custom-select" v-model="form.deliver_id">
+                  <option value="0" disabled selected
+                    >Select Delivery Method</option
+                  >
+                  <option
+                    value="1"
+                    v-show="
+                      products[0].deliver_id == 7 ||
+                        products[0].deliver_id == 1 ||
+                        products[0].deliver_id == 4 ||
+                        products[0].deliver_id == 5
+                    "
+                    >Home Delivery</option
+                  >
+                  <option
+                    value="2"
+                    v-show="
+                      products[0].deliver_id == 7 ||
+                        products[0].deliver_id == 2 ||
+                        products[0].deliver_id == 6 ||
+                        products[0].deliver_id == 4
+                    "
+                    >Dine In</option
+                  >
+                  <option
+                    value="3"
+                    v-show="
+                      products[0].deliver_id == 7 ||
+                        products[0].deliver_id == 3 ||
+                        products[0].deliver_id == 6 ||
+                        products[0].deliver_id == 5
+                    "
+                    >Take Away</option
+                  >
                 </select>
               </div>
             </form>
@@ -74,19 +117,22 @@
                 <div class="col-6">
                   <input
                     type="number"
+                    min="1"
+                    max="100"
+                    v-model="form.quantity"
                     class="form-control"
                     placeholder="Quantity"
                   />
                 </div>
                 <div class="col-6">
-                  <button id="chart" class="btn btn-primary" type="submit">
+                  <button id="chart" @click="addToCart(products[0])">
                     Add To Cart
                   </button>
                 </div>
               </div>
               <form>
                 <div class="bot">
-                  <a class="btn btn-primary" href="cart.html" role="button"
+                  <a class="btn btn-primary" href="/cart" role="button"
                     >Checkout</a
                   >
                 </div>
@@ -105,12 +151,25 @@ export default {
   data() {
     return {
       product_id: '',
-      products: [{}]
+      products: [{}],
+      cart: [],
+      form: {
+        size_choice: 0,
+        deliver_id: 0,
+        quantity: null
+      }
     }
   },
   created() {
     this.product_id = this.$route.params.id
     this.getProductById()
+    let getCart = localStorage.getItem('cart')
+    getCart = JSON.parse(getCart)
+    if (getCart) {
+      this.cart = getCart
+    } else {
+      this.cart = []
+    }
   },
   methods: {
     getProductById() {
@@ -122,6 +181,20 @@ export default {
         .catch(error => {
           console.log(error)
         })
+    },
+    addToCart(data) {
+      let totals = data.product_price * this.form.quantity
+      const setCart = {
+        product_id: data.product_id,
+        product_name: data.product_name,
+        product_price: data.product_price,
+        product_qty: this.form.quantity,
+        product_size: this.form.size_choice,
+        product_total: totals
+      }
+      this.cart = [...this.cart, setCart]
+      localStorage.setItem('cart', JSON.stringify(this.cart))
+      console.log(this.cart)
     }
   }
 }
@@ -176,15 +249,16 @@ export default {
   font-family: Poppins;
   font-style: normal;
   font-weight: normal;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 30px;
   text-align: center;
+  margin-top: 10px;
 }
 .line1 img {
   background-color: #6a4029;
   border: #6a4029 solid 6px;
   border-radius: 100%;
-  width: 40px;
+  width: 30px;
 }
 .line1 .payment {
   font-weight: bold;
@@ -192,14 +266,14 @@ export default {
 .line1 .garis1 {
   position: relative;
   border-top: gray solid 3px;
-  width: 120px;
+  width: 100px;
   top: 20px;
   margin-left: 10px;
 }
 .line1 .garis2 {
   position: relative;
   border-top: gray solid 3px;
-  width: 120px;
+  width: 100px;
   top: 20px;
 }
 .line2 {
