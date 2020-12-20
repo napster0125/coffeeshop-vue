@@ -1,20 +1,20 @@
 <template>
   <div>
     <div id="top">
-      <div id="fav">
+      <div id="fav" v-bind:class="this.activePage == 0 ? 'bold' : 'normal'">
         <b-link v-on:click="getProduct()">Favourite</b-link>
       </div>
-      <div id="cof">
-        <b-link v-on:click="getProductByCat(1)">Coffee</b-link>
+      <div id="cof" v-bind:class="this.activePage == 1 ? 'bold' : 'normal'">
+        <b-link v-on:click="getProduct(1)">Coffee</b-link>
       </div>
-      <div id="noncof">
-        <b-link v-on:click="getProductByCat(2)">Non Coffee</b-link>
+      <div id="noncof" v-bind:class="this.activePage == 2 ? 'bold' : 'normal'">
+        <b-link v-on:click="getProduct(2)">Non Coffee</b-link>
       </div>
-      <div id="food">
-        <b-link v-on:click="getProductByCat(3)">Foods</b-link>
+      <div id="food" v-bind:class="this.activePage == 3 ? 'bold' : 'normal'">
+        <b-link v-on:click="getProduct(3)">Foods</b-link>
       </div>
-      <div id="addon">
-        <b-link v-on:click="getProductByCat(4)">Add On</b-link>
+      <div id="addon" v-bind:class="this.activePage == 4 ? 'bold' : 'normal'">
+        <b-link v-on:click="getProduct(4)">Add On</b-link>
       </div>
     </div>
     <b-container class="bv-example-row">
@@ -32,26 +32,18 @@
             <p id="name">{{ item.product_name }}</p>
             <p id="price">IDR {{ item.product_price }}</p>
           </div>
-
-          <!-- <b-card
-            v-bind:title="item.product_name"
-            img-src="https://picsum.photos/600/300/?image=25"
-            img-alt="Image"
-            img-top
-            tag="article"
-            style="max-width: 10rem; height: 300px;"
-            class="mb-2"
-            id="prodcard"
-          >
-            <b-card-text> Rp. {{ item.product_price }} </b-card-text>
-
-            <b-button href="#" variant="primary">Add To Cart</b-button>
-            <b-button href="#" variant="success">Update</b-button>
-            <b-button href="#" variant="danger">Delete</b-button>
-          </b-card> -->
         </b-col>
       </b-row>
     </b-container>
+    <div id="page">
+      <b-pagination
+        v-model="currentPage"
+        :total-rows="rows"
+        :per-page="limit"
+        @change="handlePageChange"
+      >
+      </b-pagination>
+    </div>
   </div>
 </template>
 
@@ -60,10 +52,22 @@ import axios from 'axios'
 
 export default {
   name: 'ProductCard',
+  computed: {
+    rows() {
+      return this.totalRows
+    }
+  },
   data() {
     return {
       products: [],
-      category: ''
+      category: '',
+      currentPage: 1,
+      totalRows: null,
+      limit: 6,
+      page: 1,
+      activePage: 0,
+      bold: 'color : black;',
+      normal: ' '
     }
   },
   created() {
@@ -73,27 +77,44 @@ export default {
     detailProduct(product_id) {
       this.$router.push({ name: 'ProductDetail', params: { id: product_id } })
     },
-    getProduct() {
-      axios
-        .get('http://localhost:3000/product?page=1&limit=8')
-        .then(response => {
-          console.log(response)
-          this.products = response.data.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
+    getProduct(id) {
+      if (id) {
+        axios
+          .get(
+            `http://localhost:3000/product?page=${this.page}&limit=${this.limit}&category=${id}`
+          )
+          .then(response => {
+            console.log(response)
+            this.totalRows = response.data.pagination.totalData
+            this.products = response.data.data
+            this.activePage = id
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      } else {
+        axios
+          .get(
+            `http://localhost:3000/product?page=${this.page}&limit=${this.limit}`
+          )
+          .then(response => {
+            console.log(response)
+            this.totalRows = response.data.pagination.totalData
+            this.products = response.data.data
+            this.activePage = 0
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      }
     },
-    getProductByCat(id) {
-      axios
-        .get(`http://localhost:3000/product?page=1&limit=8&category=${id}`)
-        .then(response => {
-          console.log(response)
-          this.products = response.data.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
+    handlePageChange(numberPage) {
+      this.page = numberPage
+      if (this.activePage) {
+        this.getProduct(this.activePage)
+      } else {
+        this.getProduct()
+      }
     }
   }
 }
@@ -110,6 +131,10 @@ export default {
   color: black;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+#productCard:hover {
+  background-color: lightgray;
+  border: black 2px solid;
+}
 #productCard img {
   position: relative;
   left: 0;
@@ -121,9 +146,7 @@ export default {
   position: relative;
   bottom: 30px;
 }
-#prodcard {
-  border-radius: 20px;
-}
+
 #top {
   display: flex;
   flex-direction: row;
@@ -139,10 +162,16 @@ export default {
 #top div {
   margin-left: 5px;
 }
-#top a:link,
-#top a:visited {
+.normal a:link,
+.normal a:visited {
   color: #9f9f9f;
   text-decoration: none;
+}
+.bold a:link,
+.bold a:visited {
+  color: black;
+  font-weight: bold;
+  text-shadow: 2px 2px lightgray;
 }
 #top a:hover {
   color: black;
@@ -156,5 +185,8 @@ export default {
 #addon:hover {
   font-weight: bold;
   border-bottom: 3px solid black;
+}
+#page {
+  margin-top: 30px;
 }
 </style>
