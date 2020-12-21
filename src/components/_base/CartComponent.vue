@@ -213,7 +213,7 @@ export default {
   grid-template-columns: repeat(1, 1fr);
   gap: 10px;
   padding-bottom: 40px;
-  padding-top: 70px;
+  padding-top: 20px;
   margin-left: 5%;
   border-bottom: lightgray solid 4px;
   width: 90%;

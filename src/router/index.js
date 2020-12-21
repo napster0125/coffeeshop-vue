@@ -5,6 +5,8 @@ import Product from '../views/Product.vue'
 import Lifecycle from '../views/Lifecycle.vue'
 import ProductDetail from '../views/productDetail.vue'
 import Cart from '../views/cart.vue'
+import PostProduct from '../views/PostProduct.vue'
+import PostCoupon from '../views/PostCoupon.vue'
 
 Vue.use(VueRouter)
 
@@ -18,6 +20,16 @@ const routes = [
     path: '/product',
     name: 'Product',
     component: Product
+  },
+  {
+    path: '/PostProduct',
+    name: 'PostProduct',
+    component: PostProduct
+  },
+  {
+    path: '/PostCoupon',
+    name: 'PostCoupon',
+    component: PostCoupon
   },
   {
     path: '/productDetail/:id',

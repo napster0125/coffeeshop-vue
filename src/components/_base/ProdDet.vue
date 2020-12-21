@@ -1,10 +1,4 @@
 <template>
-  <!-- <div class="productDetail">
-    <h1>This is an Detail page</h1>
-    <p id="name">{{ products[0].product_name }}</p>
-    <p id="price">IDR {{ products[0].product_price }}</p>
-    <p id="desc">Description : {{ products[0].product_desc }}</p>
-  </div> -->
   <div class="main flex-container">
     <b-container fluid>
       <b-row>
@@ -174,7 +168,9 @@ export default {
   methods: {
     getProductById() {
       axios
-        .get(`http://localhost:3000/product?productId=${this.product_id}`)
+        .get(
+          `http://${process.env.VUE_APP_URL}/product?productId=${this.product_id}`
+        )
         .then(response => {
           this.products = response.data.data
         })

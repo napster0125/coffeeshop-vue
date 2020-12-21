@@ -19,9 +19,9 @@
     </div>
     <div>
       Sort :
-      <button @click="sort('product_name')">By Name</button>
-      <button @click="sort('product_price')">By Price</button>
-      <button @click="sort('product_created_at')">By Date Added</button>
+      <button @click="sort('product_name')">By Name A-Z</button>
+      <button @click="sort('product_price')">By Cheapest Price</button>
+      <button @click="sort('product_created_at')">By Oldest Product</button>
     </div>
     <b-container class="bv-example-row">
       <b-row>
@@ -81,12 +81,15 @@ export default {
   created() {
     this.getProduct()
   },
+  mounted() {
+    console.log(process.env.VUE_APP_URL)
+  },
   methods: {
     sort(param) {
       if (this.activePage) {
         axios
           .get(
-            `http://localhost:3000/product?page=${this.page}&limit=${this.limit}&category=${this.activePage}&sort=${param}`
+            `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&category=${this.activePage}&sort=${param}`
           )
           .then(response => {
             console.log(response)
@@ -101,10 +104,11 @@ export default {
       } else {
         axios
           .get(
-            `http://localhost:3000/product?page=${this.page}&limit=${this.limit}&sort=${param}`
+            `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&sort=${param}`
           )
           .then(response => {
             console.log(response)
+
             this.products = response.data.data
             this.totalRows = response.data.pagination.totalData
             this.isSorted = 1
@@ -122,7 +126,7 @@ export default {
       if (id) {
         axios
           .get(
-            `http://localhost:3000/product?page=${this.page}&limit=${this.limit}&category=${id}`
+            `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&category=${id}`
           )
           .then(response => {
             console.log(response)
@@ -138,7 +142,7 @@ export default {
       } else {
         axios
           .get(
-            `http://localhost:3000/product?page=${this.page}&limit=${this.limit}`
+            `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}`
           )
           .then(response => {
             console.log(response)
