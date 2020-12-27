@@ -13,7 +13,7 @@
 <script>
 import Navbar from '../components/_base/Navbar'
 import Footer from '../components/_base/footer'
-import Main from '../components/_base/MainPost'
+import Main from '../components/_base/MainUpdate'
 
 export default {
   name: 'Home',

@@ -119,7 +119,11 @@
                   />
                 </div>
                 <div class="col-6">
-                  <button id="chart" @click="addToCart(products[0])">
+                  <button
+                    id="chart"
+                    @click="addToCart(products[0])"
+                    type="button"
+                  >
                     Add To Cart
                   </button>
                 </div>
@@ -131,6 +135,45 @@
                   >
                 </div>
               </form>
+              <div v-if="role === 1" class="form-row" id="updel">
+                <div class="col-6">
+                  <button
+                    id="update"
+                    type="button"
+                    @click="updateProduct(products[0].product_id)"
+                  >
+                    Update
+                  </button>
+                </div>
+                <div class="col-6">
+                  <button id="delete" type="button" @click="showModal">
+                    Delete
+                  </button>
+                  <b-modal
+                    ref="my-modal"
+                    hide-footer
+                    title="Delete Confirmation"
+                  >
+                    <div class="d-block text-center">
+                      <h3>Are you sure to delete this product?</h3>
+                    </div>
+                    <b-button
+                      class="mt-3"
+                      variant="outline-danger"
+                      block
+                      @click="deleteProduct()"
+                      >Delete Product</b-button
+                    >
+                    <b-button
+                      class="mt-2"
+                      variant="outline-warning"
+                      block
+                      @click="hideModal"
+                      >Cancel</b-button
+                    >
+                  </b-modal>
+                </div>
+              </div>
             </form>
           </div>
         </div>
@@ -144,6 +187,7 @@ import axios from 'axios'
 export default {
   data() {
     return {
+      role: 1,
       product_id: '',
       products: [{}],
       cart: [],
@@ -168,9 +212,7 @@ export default {
   methods: {
     getProductById() {
       axios
-        .get(
-          `http://${process.env.VUE_APP_URL}/product?productId=${this.product_id}`
-        )
+        .get(`http://${process.env.VUE_APP_URL}/product/${this.product_id}`)
         .then(response => {
           this.products = response.data.data
         })
@@ -178,19 +220,78 @@ export default {
           console.log(error)
         })
     },
+    deleteProduct() {
+      axios
+        .delete(`http://${process.env.VUE_APP_URL}/product/${this.product_id}`)
+        .then(response => {
+          console.log(response)
+          this.$refs['my-modal'].hide()
+          this.toast3()
+          this.$router.push({ name: 'Product' })
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    updateProduct(product_id) {
+      this.$router.push({ name: 'Update', params: { id: product_id } })
+    },
     addToCart(data) {
       let totals = data.product_price * this.form.quantity
-      const setCart = {
-        product_id: data.product_id,
-        product_name: data.product_name,
-        product_price: data.product_price,
-        product_qty: this.form.quantity,
-        product_size: this.form.size_choice,
-        product_total: totals
+      if (!this.form.quantity) {
+        this.toast2('b-toaster-top-full', 'Please input quantity')
+      } else if (!this.form.size_choice) {
+        this.toast2('b-toaster-top-full', 'Please input size choice')
+      } else if (!this.form.deliver_id) {
+        this.toast2('b-toaster-top-full', 'Please input delivery method')
+      } else {
+        const setCart = {
+          product_id: data.product_id,
+          product_name: data.product_name,
+          product_price: data.product_price,
+          product_qty: this.form.quantity,
+          product_size: this.form.size_choice,
+          product_deliver: this.form.deliver_id,
+          product_total: totals
+        }
+        this.cart = [...this.cart, setCart]
+        localStorage.setItem('cart', JSON.stringify(this.cart))
+        console.log(this.cart)
+        this.toast1('b-toaster-top-full')
       }
-      this.cart = [...this.cart, setCart]
-      localStorage.setItem('cart', JSON.stringify(this.cart))
-      console.log(this.cart)
+    },
+    toast1(toaster, append = false) {
+      this.$bvToast.toast('Product added to cart', {
+        title: 'Success',
+        toaster: toaster,
+        solid: true,
+        variant: 'success',
+        appendToast: append
+      })
+    },
+    toast2(toaster, msg, append = false) {
+      this.$bvToast.toast(`${msg}`, {
+        title: 'Warning',
+        toaster: toaster,
+        solid: true,
+        variant: 'warning',
+        appendToast: append
+      })
+    },
+    toast3(toaster, append = false) {
+      this.$bvToast.toast('Product Deleted', {
+        title: 'Success deletting product',
+        toaster: toaster,
+        solid: true,
+        variant: 'warning',
+        appendToast: append
+      })
+    },
+    showModal() {
+      this.$refs['my-modal'].show()
+    },
+    hideModal() {
+      this.$refs['my-modal'].hide()
     }
   }
 }
@@ -342,6 +443,24 @@ export default {
 }
 .line4 form .bot a:hover {
   color: black;
+}
+#updel {
+  margin-top: 10px;
+}
+#update {
+  background-color: wheat;
+  border-radius: 15px;
+  padding-top: 5px;
+}
+#delete {
+  background-color: red;
+  border-radius: 15px;
+  padding-top: 5px;
+}
+#update:hover,
+#delete:hover,
+.line4 form button:hover {
+  color: white;
 }
 @media (max-width: 500px) {
   .line1 .garis1 {

@@ -54,6 +54,14 @@
                 placeholder="Input Stock"
               />
             </div>
+            <div
+              id="fav"
+              v-bind:class="this.form.fav === 1 ? 'favYes' : 'favNo'"
+            >
+              <button @click="favSet()">
+                <b v-if="this.form.fav === 0">not a</b> Favourite Product
+              </button>
+            </div>
           </div>
         </b-col>
         <b-col xl="8" md="6" id="right">
@@ -148,12 +156,12 @@
             </button>
           </div>
           <div id="input5">
-            <button type="submit" id="buttonSave" @click="postProduct()">
-              Save Product
+            <button type="button" id="buttonSave" @click="updateProduct()">
+              Update Product
             </button>
             <br />
             <br />
-            <router-link to="/">
+            <router-link to="/product">
               <button id="buttonCancel">Cancel</button>
             </router-link>
           </div>
@@ -168,6 +176,8 @@ import axios from 'axios'
 export default {
   data() {
     return {
+      product_id: '',
+      products: [{}],
       home: 0,
       dine: 0,
       take: 0,
@@ -185,17 +195,60 @@ export default {
       }
     }
   },
+  created() {
+    this.product_id = this.$route.params.id
+    this.getProductById()
+  },
   methods: {
-    postProduct() {
+    getProductById() {
       axios
-        .post(`http://${process.env.VUE_APP_URL}/product`, this.form)
+        .get(`http://${process.env.VUE_APP_URL}/product/${this.product_id}`)
         .then(response => {
-          console.log(response)
-          alert('Success Post new Product')
+          this.products = response.data.data
+          this.form.product_name = this.products[0].product_name
+          this.form.category_id = this.products[0].category_id
+          this.form.start_id = this.products[0].start_id
+          this.form.end_id = this.products[0].end_id
+          this.form.product_price = this.products[0].product_price
+          this.form.product_stock = this.products[0].product_stock
+          this.form.product_desc = this.products[0].product_desc
+          this.form.size_id = this.products[0].size_id
+          this.form.deliver_id = this.products[0].deliver_id
+          this.form.fav = this.products[0].fav
         })
         .catch(error => {
           console.log(error)
         })
+    },
+    favSet() {
+      if (this.form.fav === 0) {
+        this.form.fav = 1
+      } else {
+        this.form.fav = 0
+      }
+    },
+    updateProduct() {
+      axios
+        .patch(
+          `http://${process.env.VUE_APP_URL}/product/${this.product_id}`,
+          this.form
+        )
+        .then(response => {
+          console.log(response)
+          this.toast1('b-toaster-top-full')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    toast1(toaster, append = false) {
+      this.$bvToast.toast('Product Updated', {
+        title: 'Success',
+        toaster: toaster,
+        solid: true,
+        variant: 'success',
+        appendToast: append
+      })
     },
     deliver(param) {
       if (param == 1) {
@@ -245,6 +298,17 @@ export default {
 </script>
 
 <style scoped>
+#fav {
+  margin-top: 20px;
+}
+.favYes button {
+  background-color: #ffba33;
+  border-radius: 15px;
+}
+.favNo button {
+  background-color: white;
+  border-radius: 15px;
+}
 #left {
   margin-bottom: 30px;
 }
@@ -325,5 +389,10 @@ export default {
 }
 .yellow {
   background-color: #ffba33;
+}
+@media (max-width: 420px) {
+  #input1 {
+    margin-top: 0px;
+  }
 }
 </style>

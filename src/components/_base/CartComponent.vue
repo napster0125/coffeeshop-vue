@@ -117,7 +117,9 @@
         </div>
       </div>
       <div class="confirm">
-        <button type="submit" class="btn btn-dark">Confirm and Pay</button>
+        <button class="btn btn-dark" @click="confirm()">
+          Confirm and Pay
+        </button>
       </div>
     </div>
   </div>
@@ -135,6 +137,9 @@ export default {
     }
   },
   methods: {
+    confirm() {
+      alert('Confirmed')
+    },
     getTotal() {
       for (let x = 0; x < this.cart.length; x++) {
         this.subtotal += this.cart[x].product_price

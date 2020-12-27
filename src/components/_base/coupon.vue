@@ -24,14 +24,6 @@
               {{ couponData[couponArr].coupon_desc }}
             </div>
             <br />
-            <div id="changeCoupon">
-              <button v-show="couponArr > 0" @click="couponArr -= 1">
-                Prev Coupon
-              </button>
-              <button v-show="couponArr < 2" @click="couponArr += 1">
-                Next Coupon
-              </button>
-            </div>
           </div>
           <div class="bottom">
             <div class="one">
@@ -46,6 +38,17 @@
           </div>
         </div>
       </div>
+    </div>
+    <div id="changeCoupon">
+      <button v-if="this.couponArr > 0" @click="prevCoupon()">
+        Prev Coupon
+      </button>
+      <button
+        v-if="this.couponArr < this.couponData.length - 1"
+        @click="nextCoupon()"
+      >
+        Next Coupon
+      </button>
     </div>
     <div>
       <button type="button" class="line4">Apply Coupon</button>
@@ -78,6 +81,12 @@ export default {
     this.getCoupon()
   },
   methods: {
+    prevCoupon() {
+      this.couponArr -= 1
+    },
+    nextCoupon() {
+      this.couponArr += 1
+    },
     getCoupon() {
       axios
         .get(`http://localhost:3000/coupon`)
@@ -98,9 +107,19 @@ export default {
   /* height: 1005px; */
   background-color: white;
 }
+
 #changeCoupon button {
-  background-color: wheat;
-  font-family: 'arial';
+  position: relative;
+  width: 284px;
+  height: 64px;
+  margin-left: 10%;
+  background: #ffcb65;
+  border-radius: 20px;
+  font-family: Poppins;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 17px;
+  margin-bottom: 5px;
 }
 .line1 {
   color: #6a4029;

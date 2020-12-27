@@ -2,26 +2,36 @@
   <div>
     <div id="top">
       <div id="fav" v-bind:class="this.activePage == 0 ? 'bold' : 'normal'">
-        <b-link v-on:click="getProduct()">Favourite</b-link>
+        <b-link v-on:click="get()">Favourite</b-link>
       </div>
       <div id="cof" v-bind:class="this.activePage == 1 ? 'bold' : 'normal'">
-        <b-link v-on:click="getProduct(1)">Coffee</b-link>
+        <b-link v-on:click="get(1)">Coffee</b-link>
       </div>
       <div id="noncof" v-bind:class="this.activePage == 2 ? 'bold' : 'normal'">
-        <b-link v-on:click="getProduct(2)">Non Coffee</b-link>
+        <b-link v-on:click="get(2)">Non Coffee</b-link>
       </div>
       <div id="food" v-bind:class="this.activePage == 3 ? 'bold' : 'normal'">
-        <b-link v-on:click="getProduct(3)">Foods</b-link>
+        <b-link v-on:click="get(3)">Foods</b-link>
       </div>
       <div id="addon" v-bind:class="this.activePage == 4 ? 'bold' : 'normal'">
-        <b-link v-on:click="getProduct(4)">Add On</b-link>
+        <b-link v-on:click="get(4)">Add On</b-link>
+      </div>
+      <div id="addon" v-bind:class="this.sortShow == 1 ? 'bold' : 'normal'">
+        <b-link v-on:click="showSort()">Sort</b-link>
       </div>
     </div>
-    <div>
-      Sort :
-      <button @click="sort('product_name')">By Name A-Z</button>
-      <button @click="sort('product_price')">By Cheapest Price</button>
-      <button @click="sort('product_created_at')">By Oldest Product</button>
+    <div id="sort" v-if="this.sortShow === 1">
+      <div>
+        Sort :
+        <button @click="sort('product_name asc')">By Name A-Z</button>
+        <button @click="sort('product_price')">By Cheapest Price</button>
+        <button @click="sort('product_created_at')">By Oldest Product</button>
+      </div>
+      <div>
+        <button @click="sort('product_name desc')">By Name Z-A</button>
+        <button @click="sort('product_price desc')">By Most Expensive</button>
+        <button @click="sort('product_created_at')">By Newest Product</button>
+      </div>
     </div>
     <b-container class="bv-example-row">
       <b-row>
@@ -66,6 +76,7 @@ export default {
   data() {
     return {
       products: [],
+      sortShow: 0,
       category: '',
       currentPage: 1,
       totalRows: null,
@@ -122,6 +133,14 @@ export default {
     detailProduct(product_id) {
       this.$router.push({ name: 'ProductDetail', params: { id: product_id } })
     },
+    showSort() {
+      this.sortShow === 0 ? (this.sortShow = 1) : (this.sortShow = 0)
+    },
+    get(id) {
+      this.page = 1
+      this.currentPage = 1
+      this.getProduct(id)
+    },
     getProduct(id) {
       if (id) {
         axios
@@ -166,13 +185,7 @@ export default {
           this.getProduct()
         }
       } else if (this.isSorted === 1) {
-        if (this.sortType == 'product_name') {
-          this.sort('product_name')
-        } else if (this.sortType == 'product_price') {
-          this.sort('product_price')
-        } else if (this.sortType == 'product_created_at') {
-          this.sort('product_created_at')
-        }
+        this.sort(this.sortType)
       }
     }
   }
@@ -180,6 +193,19 @@ export default {
 </script>
 
 <style scoped>
+#sort {
+  margin-left: 13%;
+  margin-bottom: 20px;
+}
+#sort button {
+  font-family: 'Rubik', sans-serif;
+  background-color: white;
+  border-top: none;
+  margin: 10px;
+}
+#sort button:hover {
+  background-color: wheat;
+}
 #productCard {
   width: 140px;
   height: 200px;

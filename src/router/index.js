@@ -7,6 +7,9 @@ import ProductDetail from '../views/productDetail.vue'
 import Cart from '../views/cart.vue'
 import PostProduct from '../views/PostProduct.vue'
 import PostCoupon from '../views/PostCoupon.vue'
+import Search from '../views/search.vue'
+import History from '../views/history.vue'
+import Update from '../views/update.vue'
 
 Vue.use(VueRouter)
 
@@ -20,6 +23,21 @@ const routes = [
     path: '/product',
     name: 'Product',
     component: Product
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: Search
+  },
+  {
+    path: '/history',
+    name: 'History',
+    component: History
+  },
+  {
+    path: '/update/:id',
+    name: 'Update',
+    component: Update
   },
   {
     path: '/PostProduct',

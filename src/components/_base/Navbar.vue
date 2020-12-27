@@ -23,7 +23,7 @@
               </router-link>
             </b-col>
             <b-col lg="3" sm="6" xs="12" id="history">
-              <router-link to="/product">
+              <router-link to="/history">
                 History
               </router-link>
             </b-col>
@@ -33,7 +33,9 @@
       <b-col id="header-account">
         <b-row>
           <b-col>
-            <a href="url"><img src="@/assets/Vector.png"/></a>
+            <router-link to="/search">
+              <img src="@/assets/Vector.png" />
+            </router-link>
           </b-col>
           <b-col>
             <a href="url"><img src="@/assets/chat.png"/></a>
