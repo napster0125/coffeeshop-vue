@@ -89,7 +89,7 @@ export default {
     },
     getCoupon() {
       axios
-        .get(`http://localhost:3000/coupon`)
+        .get(`http://${process.env.VUE_APP_URL}/coupon`)
         .then(response => {
           this.couponData = response.data.data
         })
