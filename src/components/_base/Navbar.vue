@@ -46,12 +46,39 @@
             /></a>
           </b-col>
         </b-row>
+        <div id="logout">
+          <button @click="handleLogout">Logout</button>
+        </div>
       </b-col>
     </b-row>
   </b-container>
 </template>
 
+<script>
+import { mapActions } from 'vuex'
+export default {
+  name: 'Navbar',
+  methods: {
+    ...mapActions(['logout']),
+    handleLogout() {
+      this.logout()
+    }
+  }
+}
+</script>
+
 <style scoped>
+#logout {
+  text-align: center;
+}
+#logout button {
+  background-color: wheat;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 4px 4px 0 rgba(0, 0, 0, 0.19);
+  font-size: 12px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
 .container-header a:link,
 .container-header a:visited {
   color: black;
@@ -78,9 +105,9 @@
   padding-left: 10px;
   text-align: center;
 }
-#header-account {
+#header-account img {
   background-color: white;
-  padding-top: 20px;
+  margin-top: 10px;
 }
 #home:hover,
 #product:hover,
@@ -88,5 +115,10 @@
 #history:hover {
   font-weight: bold;
   border-bottom: 3px solid black;
+}
+@media (max-width: 550px) {
+  #header-account {
+    border-top: 2px black solid;
+  }
 }
 </style>

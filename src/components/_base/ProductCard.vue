@@ -92,9 +92,7 @@ export default {
   created() {
     this.getProduct()
   },
-  mounted() {
-    console.log(process.env.VUE_APP_URL)
-  },
+  mounted() {},
   methods: {
     sort(param) {
       if (this.activePage) {
@@ -164,7 +162,6 @@ export default {
             `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}`
           )
           .then(response => {
-            console.log(response)
             this.totalRows = response.data.pagination.totalData
             this.products = response.data.data
             this.activePage = 0

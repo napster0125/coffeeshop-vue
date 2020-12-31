@@ -40,14 +40,14 @@
       </div>
     </div>
     <div id="changeCoupon">
-      <button v-if="this.couponArr > 0" @click="prevCoupon()">
-        Prev Coupon
+      <button id="prev" v-if="this.couponArr > 0" @click="prevCoupon()">
+        -- Prev Coupon
       </button>
       <button
         v-if="this.couponArr < this.couponData.length - 1"
         @click="nextCoupon()"
       >
-        Next Coupon
+        Next Coupon --
       </button>
     </div>
     <div>
@@ -120,6 +120,9 @@ export default {
   font-weight: bold;
   font-size: 17px;
   margin-bottom: 5px;
+}
+#changeCoupon button#prev {
+  background: wheat;
 }
 .line1 {
   color: #6a4029;
