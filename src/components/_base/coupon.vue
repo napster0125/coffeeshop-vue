@@ -1,6 +1,9 @@
 <template>
   <div class="main-promo">
-    <div class="line1">Promo For You</div>
+    <div class="line1">
+      Promo For You <br />
+      {{ user.user_name }}
+    </div>
     <div class="line2">
       <li>Coupons will be updated every weeks.</li>
       <li>Check them out!</li>
@@ -41,17 +44,58 @@
     </div>
     <div id="changeCoupon">
       <button id="prev" v-if="this.couponArr > 0" @click="prevCoupon()">
-        -- Prev Coupon
+        &lt;&lt; Prev Coupon
       </button>
       <button
         v-if="this.couponArr < this.couponData.length - 1"
         @click="nextCoupon()"
       >
-        Next Coupon --
+        Next Coupon &gt;&gt;
       </button>
     </div>
     <div>
       <button type="button" class="line4">Apply Coupon</button>
+      <br />
+      <br />
+      <div>
+        <button
+          v-if="role === 1"
+          type="button"
+          class="line4"
+          id="deleteCoupon"
+          @click="showModal()"
+        >
+          Delete Coupon
+        </button>
+        <b-modal ref="my-modal" hide-footer title="Delete Confirmation">
+          <div class="d-block text-center">
+            <h3>Are you sure to delete this coupon?</h3>
+          </div>
+          <b-button
+            class="mt-3"
+            variant="outline-danger"
+            block
+            @click="deleteCoupon()"
+            >Delete Coupon</b-button
+          >
+          <b-button
+            class="mt-2"
+            variant="outline-warning"
+            block
+            @click="hideModal()"
+            >Cancel</b-button
+          >
+        </b-modal>
+        <button
+          v-if="role === 1"
+          type="button"
+          class="line4"
+          id="updateCoupon"
+          @click="updateCoupon(1)"
+        >
+          Update Coupon
+        </button>
+      </div>
     </div>
     <div class="line5">
       Terms and Condition
@@ -64,21 +108,21 @@
 </template>
 <script>
 import axios from 'axios'
+import { mapGetters } from 'vuex'
 export default {
   name: 'coupon',
   data() {
     return {
       couponArr: 0,
-      couponData: []
+      couponData: [],
+      role: 1
     }
   },
-  //   computed: {
-  //     nextCoupon() {
-  //       return (couponArr = 1)
-  //     }
-  //   },
   created() {
     this.getCoupon()
+  },
+  computed: {
+    ...mapGetters({ user: 'setUser' })
   },
   methods: {
     prevCoupon() {
@@ -96,6 +140,40 @@ export default {
         .catch(error => {
           console.log(error)
         })
+    },
+    deleteCoupon() {
+      axios
+        .delete(
+          `http://${process.env.VUE_APP_URL}/coupon?id=${
+            this.couponData[this.couponArr].coupon_id
+          }`
+        )
+        .then(response => {
+          console.log(response)
+          this.toast3()
+          this.$router.go()
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    updateCoupon(coupon_id) {
+      this.$router.push({ name: 'UpdateCoupon', params: { id: coupon_id } })
+    },
+    showModal() {
+      this.$refs['my-modal'].show()
+    },
+    hideModal() {
+      this.$refs['my-modal'].hide()
+    },
+    toast3(toaster, append = false) {
+      this.$bvToast.toast('Coupon Deleted', {
+        title: 'Success deletting Coupon',
+        toaster: toaster,
+        solid: true,
+        variant: 'warning',
+        appendToast: append
+      })
     }
   }
 }
@@ -110,7 +188,7 @@ export default {
 
 #changeCoupon button {
   position: relative;
-  width: 284px;
+  width: 260px;
   height: 64px;
   margin-left: 10%;
   background: #ffcb65;
@@ -123,6 +201,15 @@ export default {
 }
 #changeCoupon button#prev {
   background: wheat;
+}
+#deleteCoupon {
+  background-color: rgb(207, 28, 28);
+  width: 100px;
+  margin-right: 10px;
+}
+#updateCoupon {
+  background-color: rgb(218, 177, 44);
+  width: 100px;
 }
 .line1 {
   color: #6a4029;
@@ -212,7 +299,7 @@ export default {
 }
 .rec2 {
   position: absolute;
-  width: 284px;
+  width: 260px;
   height: 400px;
   background-color: black;
   margin-top: 40px;
@@ -223,7 +310,7 @@ export default {
 .rec3 {
   position: absolute;
   background-color: #895537;
-  width: 284px;
+  width: 260px;
   height: 338px;
   margin-top: 70px;
   left: 40px;
@@ -231,7 +318,7 @@ export default {
 }
 .line4 {
   position: relative;
-  width: 284px;
+  width: 260px;
   height: 64px;
   margin-left: 10%;
   background: #6a4029;

@@ -3,7 +3,7 @@
     <b-container fluid class="centered">
       <Navbar />
       <div id="main">
-        <div id="welcome" v-show="rule === 1">
+        <div id="welcome" v-show="user.user_role === 1">
           Welcome to Coffee-Shop, Admin
           <br />
           <br />
@@ -15,12 +15,12 @@
             <button>Post a Coupon</button>
           </router-link>
         </div>
-        <div id="welcome" v-show="rule === 2">
+        <div id="welcome" v-show="user.user_role != 1">
           Welcome to Coffee-Shop, User <br />
           <br />
-          <button>Create Account</button> <br />
+          <button>Check Today's Favourite</button> <br />
           <br />
-          <button>Login</button>
+          <button>Check History</button>
         </div>
       </div>
       <Footer />
@@ -31,6 +31,7 @@
 <script>
 import Navbar from '../components/_base/Navbar'
 import Footer from '../components/_base/footer'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Home',
@@ -42,6 +43,9 @@ export default {
     return {
       rule: 1
     }
+  },
+  computed: {
+    ...mapGetters({ user: 'setUser' })
   }
 }
 </script>

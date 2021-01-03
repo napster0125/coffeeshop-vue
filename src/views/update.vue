@@ -16,7 +16,7 @@ import Footer from '../components/_base/footer'
 import Main from '../components/_base/MainUpdate'
 
 export default {
-  name: 'Home',
+  name: 'update',
   components: {
     Navbar,
     Footer,

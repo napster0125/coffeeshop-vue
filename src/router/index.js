@@ -10,6 +10,7 @@ import PostCoupon from '../views/PostCoupon.vue'
 import Search from '../views/search.vue'
 import History from '../views/history.vue'
 import Update from '../views/update.vue'
+import UpdateCoupon from '../views/updateCoupon.vue'
 import Login from '../views/auth/Login.vue'
 import store from '../store'
 
@@ -47,6 +48,11 @@ const routes = [
     path: '/update/:id',
     name: 'Update',
     component: Update
+  },
+  {
+    path: '/updateCoupon/:id',
+    name: 'UpdateCoupon',
+    component: UpdateCoupon
   },
   {
     path: '/PostProduct',

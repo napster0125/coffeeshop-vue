@@ -32,6 +32,18 @@
               </div>
             </div>
             <br />
+            <div id="stock">
+              <b>Input Coupon Discount (in percent) </b><br />
+              <br />
+              <input
+                type="number"
+                min="1"
+                max="99"
+                v-model="form.coupon_discount"
+                class="form-control"
+                placeholder="Coupon Discount %"
+              />
+            </div>
             <br />
             <div id="stock">
               <b>Input Coupon Code : </b><br />
@@ -137,13 +149,15 @@
               Take Away
             </button>
           </div>
-          <div id="input5">
-            <button id="buttonSave">Save Product</button> <br />
+
+          <b-form id="input5" @submit="postProduct" @reset.prevent="onReset">
+            <button type="submit" id="buttonSave">
+              Create Coupon
+            </button>
             <br />
-            <router-link to="/">
-              <button id="buttonCancel">Cancel</button>
-            </router-link>
-          </div>
+            <br />
+            <button id="buttonCancel" type="reset">Reset</button>
+          </b-form>
         </b-col>
       </b-row>
     </b-container>
@@ -151,10 +165,56 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   data() {
     return {
       form: {
+        coupon_name: '',
+        start_date: null,
+        end_date: null,
+        coupon_price: null,
+        coupon_code: null,
+        coupon_desc: '',
+        coupon_discount: null,
+        size_id: 1,
+        deliver_id: 0,
+        home: 0,
+        dine: 0,
+        take: 0
+      }
+    }
+  },
+  methods: {
+    postProduct() {
+      const discount = parseInt(this.form.coupon_discount)
+      if (
+        !this.form.coupon_name ||
+        !this.form.start_date ||
+        !this.form.end_date ||
+        !this.form.coupon_price ||
+        !this.form.coupon_code ||
+        !this.form.coupon_discount ||
+        !this.form.deliver_id
+      ) {
+        return alert('Please input all data')
+      } else if (discount > 99) {
+        return alert("Coupon discount (%) can't exceed 99%")
+      } else {
+        axios
+          .post(`http://${process.env.VUE_APP_URL}/coupon`, this.form)
+          .then(response => {
+            console.log(response)
+            alert('Success Post new coupon')
+          })
+          .catch(error => {
+            console.log(error)
+            alert(error)
+          })
+      }
+    },
+    onReset() {
+      this.form = {
         coupon_name: '',
         start_date: null,
         end_date: null,
@@ -167,9 +227,7 @@ export default {
         dine: 0,
         take: 0
       }
-    }
-  },
-  methods: {
+    },
     deliver(param) {
       if (param == 1) {
         if (this.form.home == 0) {

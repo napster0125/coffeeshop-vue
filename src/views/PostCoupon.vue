@@ -16,7 +16,7 @@ import Footer from '../components/_base/footer'
 import MainCoupon from '../components/_base/MainPostCoupon'
 
 export default {
-  name: 'Home',
+  name: 'postCoupon',
   components: {
     Navbar,
     Footer,

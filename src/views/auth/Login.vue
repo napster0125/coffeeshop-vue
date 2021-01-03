@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>HALAMAN LOGIN</h1>
+    <h3>{{ namaSaya }}</h3>
     <b-form @submit.prevent="onSubmit" @reset.prevent="onReset">
       <input
         type="email"

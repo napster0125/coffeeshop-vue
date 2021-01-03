@@ -16,7 +16,7 @@ import Footer from '../components/_base/footer'
 import Main from '../components/_base/MainPost'
 
 export default {
-  name: 'Home',
+  name: 'postProduct',
   components: {
     Navbar,
     Footer,

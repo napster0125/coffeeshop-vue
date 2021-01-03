@@ -154,7 +154,7 @@
             <br />
             <br />
             <router-link to="/">
-              <button id="buttonCancel">Cancel</button>
+              <button id="buttonCancel" type="reset">Cancel</button>
             </router-link>
           </div>
         </b-col>

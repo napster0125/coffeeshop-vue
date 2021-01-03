@@ -14,7 +14,7 @@ import Footer from '../components/_base/footer'
 import HistoryComponent from '../components/_base/historyComponent'
 
 export default {
-  name: 'Home',
+  name: 'history',
   components: {
     Navbar,
     HistoryComponent,
