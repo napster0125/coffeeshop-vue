@@ -59,7 +59,7 @@
       <br />
       <div>
         <button
-          v-if="role === 1"
+          v-if="user.user_role === 1"
           type="button"
           class="line4"
           id="deleteCoupon"
@@ -87,11 +87,11 @@
           >
         </b-modal>
         <button
-          v-if="role === 1"
+          v-if="user.user_role === 1"
           type="button"
           class="line4"
           id="updateCoupon"
-          @click="updateCoupon(1)"
+          @click="updateCoupon(couponData[couponArr].coupon_id)"
         >
           Update Coupon
         </button>
@@ -114,8 +114,7 @@ export default {
   data() {
     return {
       couponArr: 0,
-      couponData: [],
-      role: 1
+      couponData: []
     }
   },
   created() {

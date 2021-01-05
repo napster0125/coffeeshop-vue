@@ -64,24 +64,31 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'ProductCard',
   computed: {
-    rows() {
-      return this.totalRows
-    }
+    ...mapGetters({
+      limit: 'getLimitProduct',
+      page: 'getPageProduct',
+      products: 'getDataProduct',
+      rows: 'getTotalRowsProduct'
+    })
+    // rows() {
+    //   return this.totalRows
+    // }
   },
   data() {
     return {
-      products: [],
+      // products: [],
       sortShow: 0,
       category: '',
       currentPage: 1,
-      totalRows: null,
-      limit: 5,
-      page: 1,
+      // totalRows: null,
+      // limit: 5,
+      // page: 1,
       activePage: 0,
       isSorted: 0,
       sortType: '',
@@ -90,43 +97,58 @@ export default {
     }
   },
   created() {
-    this.getProduct()
+    this.resetPage()
+    this.currentPage = 1
+    this.getProducts()
+    console.log(this.limit)
   },
-  mounted() {},
   methods: {
+    ...mapActions(['getProducts', 'getProductsSort']),
+    ...mapMutations(['changePage', 'resetPage']),
     sort(param) {
-      if (this.activePage) {
-        axios
-          .get(
-            `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&category=${this.activePage}&sort=${param}`
-          )
-          .then(response => {
-            console.log(response)
-            this.products = response.data.data
-            this.totalRows = response.data.pagination.totalData
-            this.isSorted = 1
-            this.sortType = param
-          })
-          .catch(error => {
-            console.log(error)
-          })
-      } else {
-        axios
-          .get(
-            `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&sort=${param}`
-          )
-          .then(response => {
-            console.log(response)
-
-            this.products = response.data.data
-            this.totalRows = response.data.pagination.totalData
-            this.isSorted = 1
-            this.sortType = param
-          })
-          .catch(error => {
-            console.log(error)
-          })
+      //untuk sort
+      const sortData = {
+        sort: param,
+        category: this.activePage
       }
+      // if (this.activePage) {
+      this.getProductsSort(sortData)
+      this.isSorted = 1
+      this.sortType = param
+      // axios
+      //   .get(
+      //     `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&category=${this.activePage}&sort=${param}`
+      //   )
+      //   .then(response => {
+      //     console.log(response)
+      //     this.products = response.data.data
+      //     this.totalRows = response.data.pagination.totalData
+      //     this.isSorted = 1
+      //     this.sortType = param
+      //   })
+      //   .catch(error => {
+      //     console.log(error)
+      //   })
+      // } else {
+      // this.getProductsSort(sortData)
+      // this.isSorted = 1
+      // this.sortType = param
+      // axios
+      //   .get(
+      //     `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&sort=${param}`
+      //   )
+      //   .then(response => {
+      //     console.log(response)
+
+      //     this.products = response.data.data
+      //     this.totalRows = response.data.pagination.totalData
+      //     this.isSorted = 1
+      //     this.sortType = param
+      //   })
+      //   .catch(error => {
+      //     console.log(error)
+      //   })
+      // }
     },
     detailProduct(product_id) {
       this.$router.push({ name: 'ProductDetail', params: { id: product_id } })
@@ -135,46 +157,55 @@ export default {
       this.sortShow === 0 ? (this.sortShow = 1) : (this.sortShow = 0)
     },
     get(id) {
-      this.page = 1
+      this.resetPage()
       this.currentPage = 1
       this.getProduct(id)
     },
     getProduct(id) {
+      //untuk non sorted, get berdasarkan category(id)
       if (id) {
-        axios
-          .get(
-            `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&category=${id}`
-          )
-          .then(response => {
-            console.log(response)
-            this.totalRows = response.data.pagination.totalData
-            this.products = response.data.data
-            this.activePage = id
-            this.isSorted = 0
-            this.sortType = null
-          })
-          .catch(error => {
-            console.log(error)
-          })
+        this.getProducts(id)
+        this.activePage = id
+        this.isSorted = 0
+        this.sortType = null
+        // axios
+        //   .get(
+        //     `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&category=${id}`
+        //   )
+        //   .then(response => {
+        //     console.log(response)
+        //     this.totalRows = response.data.pagination.totalData
+        //     this.products = response.data.data
+        //     this.activePage = id
+        //     this.isSorted = 0
+        //     this.sortType = null
+        //   })
+        //   .catch(error => {
+        //     console.log(error)
+        //   })
       } else {
-        axios
-          .get(
-            `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}`
-          )
-          .then(response => {
-            this.totalRows = response.data.pagination.totalData
-            this.products = response.data.data
-            this.activePage = 0
-            this.isSorted = 0
-            this.sortType = null
-          })
-          .catch(error => {
-            console.log(error)
-          })
+        this.getProducts()
+        this.activePage = 0
+        this.isSorted = 0
+        this.sortType = null
+        //   axios
+        //     .get(
+        //       `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}`
+        //     )
+        //     .then(response => {
+        //       this.totalRows = response.data.pagination.totalData
+        //       this.products = response.data.data
+        //       this.activePage = 0
+        //       this.isSorted = 0
+        //       this.sortType = null
+        //     })
+        //     .catch(error => {
+        //       console.log(error)
+        //     })
       }
     },
     handlePageChange(numberPage) {
-      this.page = numberPage
+      this.changePage(numberPage)
       if (this.isSorted === 0) {
         if (this.activePage) {
           this.getProduct(this.activePage)

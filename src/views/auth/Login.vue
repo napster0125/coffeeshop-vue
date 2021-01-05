@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 export default {
   name: 'Login',
   data() {
@@ -32,14 +32,7 @@ export default {
       }
     }
   },
-  computed: {
-    // dataName() {
-    //   return this.$store.state.name  // cara ke-1
-    // }
 
-    // ...mapState(['name']) // cara ke-2
-    ...mapState({ namaSaya: 'name' }) //cara ke-2 nama custom
-  },
   methods: {
     ...mapActions(['login']),
     onSubmit() {

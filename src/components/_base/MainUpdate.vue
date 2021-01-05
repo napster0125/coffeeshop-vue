@@ -215,6 +215,17 @@ export default {
           this.form.size_id = this.products[0].size_id
           this.form.deliver_id = this.products[0].deliver_id
           this.form.fav = this.products[0].fav
+          // deliver handling ===================
+          const deliv = this.form.deliver_id
+          if (deliv == 1 || deliv == 4 || deliv == 5 || deliv == 7) {
+            this.home = 1
+          }
+          if (deliv == 2 || deliv == 4 || deliv == 6 || deliv == 7) {
+            this.dine = 1
+          }
+          if (deliv == 3 || deliv == 5 || deliv == 6 || deliv == 7) {
+            this.take = 1
+          }
         })
         .catch(error => {
           console.log(error)
@@ -228,18 +239,32 @@ export default {
       }
     },
     updateProduct() {
-      axios
-        .patch(
-          `http://${process.env.VUE_APP_URL}/product/${this.product_id}`,
-          this.form
-        )
-        .then(response => {
-          console.log(response)
-          this.toast1('b-toaster-top-full')
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      if (
+        !this.form.product_name ||
+        !this.form.category_id ||
+        !this.form.start_id ||
+        !this.form.end_id ||
+        !this.form.product_price ||
+        !this.form.product_stock ||
+        !this.form.product_desc ||
+        !this.form.deliver_id
+      ) {
+        return this.toast2('b-toaster-top-full')
+      } else {
+        axios
+          .patch(
+            `http://${process.env.VUE_APP_URL}/product/${this.product_id}`,
+            this.form
+          )
+          .then(response => {
+            console.log(response)
+            this.toast1('b-toaster-top-full')
+            this.$router.go()
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      }
     },
     toast1(toaster, append = false) {
       this.$bvToast.toast('Product Updated', {
@@ -247,6 +272,15 @@ export default {
         toaster: toaster,
         solid: true,
         variant: 'success',
+        appendToast: append
+      })
+    },
+    toast2(toaster, append = false) {
+      this.$bvToast.toast('Please input all data', {
+        title: 'Warning',
+        toaster: toaster,
+        solid: true,
+        variant: 'warning',
         appendToast: append
       })
     },

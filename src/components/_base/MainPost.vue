@@ -3,13 +3,21 @@
     <b-container fluid>
       <b-row>
         <b-col xl="4" md="6" id="left">
-          <div id="circle"><img src="@/assets/photoGrey.png" /></div>
+          <div id="circle">
+            <img v-if="!form.product_image" src="@/assets/photoGrey.png" />
+            <img v-if="form.product_image" src="url" />
+          </div>
           <div id="top">
             <b-button block size="lg" variant="dark">Take A Picture</b-button>
             <br />
             <b-button block size="lg" variant="warning"
               >Choose from Gallery</b-button
             >
+            <br />
+            <div>
+              <input type="file" @change="handleFile" />
+            </div>
+            <br />
             <div id="delivery">
               Delivery Hour : <br />
               <br />
@@ -54,6 +62,7 @@
                 placeholder="Input Stock"
               />
             </div>
+            {{ url }}
           </div>
         </b-col>
         <b-col xl="8" md="6" id="right">
@@ -147,16 +156,19 @@
               Take Away
             </button>
           </div>
-          <div id="input5">
-            <button type="submit" id="buttonSave" @click="postProduct()">
+          <b-form
+            id="input5"
+            @submit.prevent="postProduct"
+            @reset.prevent="onReset"
+          >
+            <button type="submit" id="buttonSave">
               Save Product
             </button>
             <br />
             <br />
-            <router-link to="/">
-              <button id="buttonCancel" type="reset">Cancel</button>
-            </router-link>
-          </div>
+
+            <button id="buttonCancel" type="reset">Reset</button>
+          </b-form>
         </b-col>
       </b-row>
     </b-container>
@@ -164,10 +176,11 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 export default {
   data() {
     return {
+      url: null,
       home: 0,
       dine: 0,
       take: 0,
@@ -181,21 +194,73 @@ export default {
         product_desc: '',
         size_id: 1,
         deliver_id: 0,
-        fav: 0
+        fav: 0,
+        product_image: null
       }
     }
   },
   methods: {
+    handleFile(event) {
+      this.form.product_image = event.target.files[0]
+      const file = event.target.files[0]
+      this.url = URL.createObjectURL(file)
+    },
     postProduct() {
-      axios
-        .post(`http://${process.env.VUE_APP_URL}/product`, this.form)
-        .then(response => {
-          console.log(response)
-          alert('Success Post new Product')
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      if (
+        !this.form.product_name ||
+        !this.form.category_id ||
+        !this.form.start_id ||
+        !this.form.end_id ||
+        !this.form.product_price ||
+        !this.form.product_stock ||
+        !this.form.product_desc ||
+        !this.form.product_image ||
+        !this.form.deliver_id
+      ) {
+        return this.toast1('b-toaster-top-full')
+      } else {
+        console.log(this.form)
+        const {
+          product_name,
+          category_id,
+          start_id,
+          end_id,
+          product_price,
+          product_stock,
+          product_desc,
+          product_image,
+          deliver_id,
+          size_id,
+          fav
+        } = this.form
+        const data = new FormData()
+        data.append('product_name', product_name)
+        data.append('category_id', category_id)
+        data.append('start_id', start_id)
+        data.append('end_id', end_id)
+        data.append('product_price', product_price)
+        data.append('product_stock', product_stock)
+        data.append('product_desc', product_desc)
+        data.append('product_image', product_image)
+        data.append('deliver_id', deliver_id)
+        data.append('size_id', size_id)
+        data.append('fav', fav)
+
+        for (var pair of data.entries()) {
+          console.log(pair[0] + ', ' + pair[1])
+        }
+
+        // axios
+        //   .post(`http://${process.env.VUE_APP_URL}/product`, this.form)
+        //   .then(response => {
+        //     console.log(response)
+        //     this.toast2('b-toaster-top-full')
+        //     this.onReset()
+        //   })
+        //   .catch(error => {
+        //     console.log(error)
+        //   })
+      }
     },
     deliver(param) {
       if (param == 1) {
@@ -239,6 +304,40 @@ export default {
       } else {
         this.form.deliver_id = 0
       }
+    },
+    onReset() {
+      ;(this.home = 0),
+        (this.dine = 0),
+        (this.take = 0),
+        (this.form = {
+          product_name: '',
+          category_id: 0,
+          start_id: 0,
+          end_id: 0,
+          product_price: null,
+          product_stock: null,
+          product_desc: '',
+          size_id: 1,
+          deliver_id: 0
+        })
+    },
+    toast1(toaster, append = false) {
+      this.$bvToast.toast('Please Input All data', {
+        title: 'Warning',
+        toaster: toaster,
+        solid: true,
+        variant: 'warning',
+        appendToast: append
+      })
+    },
+    toast2(toaster, append = false) {
+      this.$bvToast.toast('Product created successfully', {
+        title: 'Success',
+        toaster: toaster,
+        solid: true,
+        variant: 'success',
+        appendToast: append
+      })
     }
   }
 }
