@@ -10,12 +10,18 @@
           <div id="top">
             <b-button block size="lg" variant="dark">Take A Picture</b-button>
             <br />
-            <b-button block size="lg" variant="warning"
+            <b-button @click="chooseFile()" block size="lg" variant="warning"
               >Choose from Gallery</b-button
             >
             <br />
             <div>
-              <input type="file" @change="handleFile" />
+              <input
+                id="formInputImage"
+                type="file"
+                accept="image/x-png,image/jpg,image/jpeg"
+                @change="handleFile"
+                hidden
+              />
             </div>
             <br />
             <div id="delivery">
@@ -176,7 +182,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions } from 'vuex'
+
 export default {
   data() {
     return {
@@ -200,10 +207,19 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['uploadProduct']),
+    chooseFile() {
+      document.getElementById('formInputImage').click()
+    },
     handleFile(event) {
       this.form.product_image = event.target.files[0]
-      const file = event.target.files[0]
-      this.url = URL.createObjectURL(file)
+      this.url = URL.createObjectURL(
+        (this.form.product_image = event.target.files[0])
+      )
+      const type = event.target.files[0].type
+      if (type != 'image/jpeg' && type != 'image/png' && type != 'image/jpg') {
+        return this.toast3('b-toaster-top-full')
+      }
     },
     postProduct() {
       if (
@@ -219,45 +235,9 @@ export default {
       ) {
         return this.toast1('b-toaster-top-full')
       } else {
-        const {
-          product_name,
-          category_id,
-          start_id,
-          end_id,
-          product_price,
-          product_stock,
-          product_desc,
-          product_image,
-          deliver_id,
-          size_id,
-          fav
-        } = this.form
-        const data = new FormData()
-        data.append('product_name', product_name)
-        data.append('category_id', category_id)
-        data.append('start_id', start_id)
-        data.append('end_id', end_id)
-        data.append('product_price', product_price)
-        data.append('product_stock', product_stock)
-        data.append('product_desc', product_desc)
-        data.append('product_image', product_image)
-        data.append('deliver_id', deliver_id)
-        data.append('size_id', size_id)
-        data.append('fav', fav)
-
-        for (var pair of data.entries()) {
-          console.log(pair[0] + ', ' + pair[1])
-        }
-        axios
-          .post(`http://${process.env.VUE_APP_URL}/product`, data)
-          .then(response => {
-            console.log(response)
-            this.toast2('b-toaster-top-full')
-            this.onReset()
-          })
-          .catch(error => {
-            console.log(error)
-          })
+        this.uploadProduct(this.form)
+        this.toast2('b-toaster-top-full')
+        this.onReset()
       }
     },
     deliver(param) {
@@ -336,6 +316,15 @@ export default {
         variant: 'success',
         appendToast: append
       })
+    },
+    toast3(toaster, append = false) {
+      this.$bvToast.toast('Uploaded picture must be PNG or JPEG format', {
+        title: 'Warning',
+        toaster: toaster,
+        solid: true,
+        variant: 'warning',
+        appendToast: append
+      })
     }
   }
 }
@@ -344,6 +333,11 @@ export default {
 <style scoped>
 #circle #imageUpload {
   border-radius: 100%;
+  width: 200px;
+  height: 200px;
+  position: relative;
+  right: 50px;
+  bottom: 50px;
 }
 #left {
   margin-bottom: 30px;

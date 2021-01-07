@@ -113,6 +113,49 @@ export default {
             })
         }
       })
+    },
+    uploadProduct(context, payload) {
+      console.log('cek payload')
+      console.log(payload)
+      console.log(context)
+      return new Promise((resolve, reject) => {
+        const {
+          product_name,
+          category_id,
+          start_id,
+          end_id,
+          product_price,
+          product_stock,
+          product_desc,
+          product_image,
+          deliver_id,
+          size_id,
+          fav
+        } = payload
+        const data = new FormData()
+        data.append('product_name', product_name)
+        data.append('category_id', category_id)
+        data.append('start_id', start_id)
+        data.append('end_id', end_id)
+        data.append('product_price', product_price)
+        data.append('product_stock', product_stock)
+        data.append('product_desc', product_desc)
+        data.append('product_image', product_image)
+        data.append('deliver_id', deliver_id)
+        data.append('size_id', size_id)
+        data.append('fav', fav)
+
+        axios
+          .post(`http://${process.env.VUE_APP_URL}/product`, data)
+          .then(response => {
+            console.log(response)
+            resolve(response)
+          })
+          .catch(error => {
+            console.log(error)
+            reject(error)
+          })
+      })
     }
   },
   getters: {
