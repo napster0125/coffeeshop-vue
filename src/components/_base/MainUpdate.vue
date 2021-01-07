@@ -3,11 +3,27 @@
     <b-container fluid>
       <b-row>
         <b-col xl="4" md="6" id="left">
-          <div id="circle"><img src="@/assets/photoGrey.png" /></div>
+          <div id="circle">
+            <img v-if="!form.product_image" src="@/assets/photoGrey.png" />
+            <img
+              id="imageUploads"
+              class="imgUpload"
+              v-if="form.product_image && !url"
+              :src="'http://localhost:3000/product/' + form.product_image"
+            />
+            <img id="imageUpload" class="imgUpload" v-if="url" :src="url" />
+            <input
+              id="formInputImage"
+              type="file"
+              accept="image/x-png,image/jpg,image/jpeg"
+              @change="handleFile"
+              hidden
+            />
+          </div>
           <div id="top">
             <b-button block size="lg" variant="dark">Take A Picture</b-button>
             <br />
-            <b-button block size="lg" variant="warning"
+            <b-button @click="chooseFile()" block size="lg" variant="warning"
               >Choose from Gallery</b-button
             >
             <div id="delivery">
@@ -156,10 +172,12 @@
             </button>
           </div>
           <div id="input5">
-            <button type="button" id="buttonSave" @click="updateProduct()">
+            <button type="button" id="buttonSave" @click="updateProducts()">
               Update Product
             </button>
             <br />
+            <br />
+            {{ form }}
             <br />
             <router-link to="/product">
               <button id="buttonCancel">Cancel</button>
@@ -172,64 +190,58 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   data() {
     return {
       product_id: '',
-      products: [{}],
       home: 0,
       dine: 0,
-      take: 0,
-      form: {
-        product_name: '',
-        category_id: 0,
-        start_id: 0,
-        end_id: 0,
-        product_price: null,
-        product_stock: null,
-        product_desc: '',
-        size_id: 1,
-        deliver_id: 0,
-        fav: 0
-      }
+      take: 0
     }
+  },
+  computed: {
+    ...mapGetters({
+      products: 'getDataProductById',
+      form: 'getFormId'
+    })
   },
   created() {
     this.product_id = this.$route.params.id
     this.getProductById()
+    // deliver handling ===================
+    const deliv = this.form.deliver_id
+    if (deliv == 1 || deliv == 4 || deliv == 5 || deliv == 7) {
+      this.home = 1
+    }
+    if (deliv == 2 || deliv == 4 || deliv == 6 || deliv == 7) {
+      this.dine = 1
+    }
+    if (deliv == 3 || deliv == 5 || deliv == 6 || deliv == 7) {
+      this.take = 1
+    }
   },
   methods: {
+    ...mapActions(['getProductsById', 'updateProduct']),
+    ...mapGetters(['getDataProductById']),
+
     getProductById() {
-      axios
-        .get(`http://${process.env.VUE_APP_URL}/product/${this.product_id}`)
-        .then(response => {
-          this.products = response.data.data
-          this.form.product_name = this.products[0].product_name
-          this.form.category_id = this.products[0].category_id
-          this.form.start_id = this.products[0].start_id
-          this.form.end_id = this.products[0].end_id
-          this.form.product_price = this.products[0].product_price
-          this.form.product_stock = this.products[0].product_stock
-          this.form.product_desc = this.products[0].product_desc
-          this.form.size_id = this.products[0].size_id
-          this.form.deliver_id = this.products[0].deliver_id
-          this.form.fav = this.products[0].fav
-          // deliver handling ===================
-          const deliv = this.form.deliver_id
-          if (deliv == 1 || deliv == 4 || deliv == 5 || deliv == 7) {
-            this.home = 1
-          }
-          if (deliv == 2 || deliv == 4 || deliv == 6 || deliv == 7) {
-            this.dine = 1
-          }
-          if (deliv == 3 || deliv == 5 || deliv == 6 || deliv == 7) {
-            this.take = 1
-          }
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.getProductsById(this.product_id)
+    },
+    handleFile(event) {
+      this.form.product_image = event.target.files[0]
+      this.url = URL.createObjectURL(
+        (this.form.product_image = event.target.files[0])
+      )
+      const type = event.target.files[0].type
+      if (type != 'image/jpeg' && type != 'image/png' && type != 'image/jpg') {
+        return this.toast3('b-toaster-top-full')
+      }
+    },
+    chooseFile() {
+      document.getElementById('formInputImage').click()
     },
     favSet() {
       if (this.form.fav === 0) {
@@ -238,7 +250,7 @@ export default {
         this.form.fav = 0
       }
     },
-    updateProduct() {
+    updateProducts() {
       if (
         !this.form.product_name ||
         !this.form.category_id ||
@@ -247,23 +259,28 @@ export default {
         !this.form.product_price ||
         !this.form.product_stock ||
         !this.form.product_desc ||
-        !this.form.deliver_id
+        !this.form.deliver_id ||
+        !this.form.product_image
       ) {
         return this.toast2('b-toaster-top-full')
       } else {
-        axios
-          .patch(
-            `http://${process.env.VUE_APP_URL}/product/${this.product_id}`,
-            this.form
-          )
-          .then(response => {
-            console.log(response)
-            this.toast1('b-toaster-top-full')
-            this.$router.go()
-          })
-          .catch(error => {
-            console.log(error)
-          })
+        // this.updateProduct(this.form)
+        const param = { form: this.form, id: this.product_id }
+
+        this.updateProduct(param)
+        //   axios
+        //     .patch(
+        //       `http://${process.env.VUE_APP_URL}/product/${this.product_id}`,
+        //       data
+        //     )
+        //     .then(response => {
+        //       console.log(response)
+        this.toast1('b-toaster-top-full')
+        this.$router.go()
+        //     })
+        //     .catch(error => {
+        //       console.log(error)
+        //     })
       }
     },
     toast1(toaster, append = false) {
@@ -335,6 +352,7 @@ export default {
 #fav {
   margin-top: 20px;
 }
+
 .favYes button {
   background-color: #ffba33;
   border-radius: 15px;
@@ -379,6 +397,14 @@ export default {
   width: 100px;
   margin-left: 50px;
   margin-top: 50px;
+}
+#circle img.imgUpload {
+  border-radius: 100%;
+  width: 200px;
+  height: 200px;
+  position: relative;
+  right: 50px;
+  bottom: 50px;
 }
 #delivery {
   margin-top: 40px;

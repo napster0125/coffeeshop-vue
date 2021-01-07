@@ -183,13 +183,14 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   data() {
     return {
       role: 1,
       product_id: '',
-      products: [{}],
       cart: [],
       form: {
         size_choice: 0,
@@ -209,29 +210,30 @@ export default {
       this.cart = []
     }
   },
+  computed: {
+    ...mapGetters({
+      products: 'getDataProductById'
+    })
+  },
   methods: {
+    ...mapActions(['getProductsById', 'deletesProduct']),
+    ...mapGetters(['getDataProductById']),
     getProductById() {
-      axios
-        .get(`http://${process.env.VUE_APP_URL}/product/${this.product_id}`)
-        .then(response => {
-          this.products = response.data.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.getProductsById(this.product_id)
+      // axios
+      //   .get(`http://${process.env.VUE_APP_URL}/product/${this.product_id}`)
+      //   .then(response => {
+      //     this.products = response.data.data
+      //   })
+      //   .catch(error => {
+      //     console.log(error)
+      //   })
     },
     deleteProduct() {
-      axios
-        .delete(`http://${process.env.VUE_APP_URL}/product/${this.product_id}`)
-        .then(response => {
-          console.log(response)
-          this.$refs['my-modal'].hide()
-          this.toast3()
-          this.$router.push({ name: 'Product' })
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.deletesProduct(this.product_id)
+      this.$refs['my-modal'].hide()
+      this.toast3()
+      this.$router.push({ name: 'Product' })
     },
     updateProduct(product_id) {
       this.$router.push({ name: 'Update', params: { id: product_id } })
