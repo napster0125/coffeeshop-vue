@@ -19,18 +19,18 @@
         <div id="sort" v-if="this.sortShow === 1">
           <div>
             Sort :
-            <button @click="sort('product_name asc')">By Name A-Z</button>
-            <button @click="sort('product_price')">By Cheapest Price</button>
-            <button @click="sort('product_created_at')">
+            <button @click="sorting('product_name asc')">By Name A-Z</button>
+            <button @click="sorting('product_price')">By Cheapest Price</button>
+            <button @click="sorting('product_created_at')">
               By Oldest Product
             </button>
           </div>
           <div>
-            <button @click="sort('product_name desc')">By Name Z-A</button>
-            <button @click="sort('product_price desc')">
+            <button @click="sorting('product_name desc')">By Name Z-A</button>
+            <button @click="sorting('product_price desc')">
               By Most Expensive
             </button>
-            <button @click="sort('product_created_at desc')">
+            <button @click="sorting('product_created_at desc')">
               By Newest Product
             </button>
           </div>
@@ -46,7 +46,14 @@
               :key="index"
             >
               <div id="productCard" @click="detailProduct(item.product_id)">
-                <img src="@/assets/cold.png" style="border-radius: 50%;" />
+                <img
+                  :src="
+                    !item.product_image
+                      ? 'http://localhost:3000/product/cold.png'
+                      : 'http://localhost:3000/product/' + item.product_image
+                  "
+                  style="border-radius: 50%;"
+                />
                 <p id="name">{{ item.product_name }}</p>
                 <p id="price">IDR {{ item.product_price }}</p>
               </div>
@@ -77,83 +84,70 @@
 <script>
 import Navbar from '../components/_base/Navbar'
 import Footer from '../components/_base/footer'
-import axios from 'axios'
+import { mapActions, mapMutations, mapGetters } from 'vuex'
+
 export default {
   name: 'Search',
   components: {
     Navbar,
     Footer
   },
+  created() {
+    this.resetProduct()
+  },
   computed: {
-    rows() {
-      return this.totalRows
-    }
+    ...mapGetters({
+      limit: 'getLimitProduct',
+      page: 'getPageProduct',
+      products: 'getDataProduct',
+      rows: 'getTotalRowsProduct'
+    })
   },
   data() {
     return {
-      products: [],
       searchValue: 0,
       currentPage: 1,
-      totalRows: null,
-      limit: 4,
-      page: 1,
       sortShow: 0,
       isSorted: 0,
       sortType: '',
       name
     }
   },
-  mounted() {
-    console.log(process.env.VUE_APP_URL)
-  },
   methods: {
+    ...mapActions(['getProducts', 'getProductsSort']),
+    ...mapMutations(['resetProduct', 'resetPage', 'changePage']),
+
     detailProduct(product_id) {
       this.$router.push({ name: 'ProductDetail', params: { id: product_id } })
     },
     showSort() {
       this.sortShow === 0 ? (this.sortShow = 1) : (this.sortShow = 0)
     },
+    sorting(param) {
+      this.resetPage()
+      this.currentPage = 1
+      this.sort(param)
+    },
     sort(param) {
-      axios
-        .get(
-          `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&productName=${this.name}&sort=${param}`
-        )
-        .then(response => {
-          console.log(response)
-          this.products = response.data.data
-          this.totalRows = response.data.pagination.totalData
-          this.isSorted = 1
-          this.sortType = param
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      const params = { name: this.name, sort: param }
+      this.getProductsSort(params)
+      this.isSorted = 1
+      this.sortType = param
     },
     get(name) {
-      this.page = 1
+      this.resetPage()
       this.currentPage = 1
       this.getProduct(name)
     },
-    getProduct(name) {
-      this.products = []
+    getProduct(search) {
+      const param = { name: search }
       this.searchValue = 1
-      axios
-        .get(
-          `http://${process.env.VUE_APP_URL}/product?page=${this.page}&limit=${this.limit}&productName=${name}`
-        )
-        .then(response => {
-          console.log(response)
-          this.totalRows = response.data.pagination.totalData
-          this.products = response.data.data
-          this.isSorted = 0
-          this.sortType = null
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.getProducts(param)
+      this.isSorted = 0
+      this.sortType = null
     },
     handlePageChange(numberPage) {
-      this.page = numberPage
+      this.changePage(numberPage)
       this.currentPage = numberPage
       if (this.isSorted === 0) {
         this.getProduct(this.name)
@@ -191,6 +185,7 @@ export default {
 }
 #notFound {
   margin-top: 30px;
+  margin-bottom: 50px;
   background-color: white;
   font-size: 30px;
 }
@@ -245,12 +240,12 @@ export default {
 }
 .normal a:link,
 .normal a:visited {
-  color: white;
+  color: black;
   text-decoration: none;
 }
 .bold a:link,
 .bold a:visited {
-  color: white;
+  color: black;
   font-weight: bold;
 }
 #top a:hover {
@@ -258,10 +253,10 @@ export default {
   text-shadow: 2px 2px lightgray;
 }
 #addon {
-  background-color: black;
-  border: 2px solid white;
+  background-color: wheat;
+  border: 2px solid black;
   font-size: 20px;
-  color: white;
+  color: black;
   border-radius: 10px;
   width: 100px;
   margin-left: auto;

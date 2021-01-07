@@ -5,7 +5,7 @@
         <b-col xl="4" md="6" id="left">
           <div id="circle">
             <img v-if="!form.product_image" src="@/assets/photoGrey.png" />
-            <img v-if="form.product_image" src="url" />
+            <img id="imageUpload" v-if="form.product_image" :src="url" />
           </div>
           <div id="top">
             <b-button block size="lg" variant="dark">Take A Picture</b-button>
@@ -176,7 +176,7 @@
 </template>
 
 <script>
-// import axios from 'axios'
+import axios from 'axios'
 export default {
   data() {
     return {
@@ -219,7 +219,6 @@ export default {
       ) {
         return this.toast1('b-toaster-top-full')
       } else {
-        console.log(this.form)
         const {
           product_name,
           category_id,
@@ -249,17 +248,16 @@ export default {
         for (var pair of data.entries()) {
           console.log(pair[0] + ', ' + pair[1])
         }
-
-        // axios
-        //   .post(`http://${process.env.VUE_APP_URL}/product`, this.form)
-        //   .then(response => {
-        //     console.log(response)
-        //     this.toast2('b-toaster-top-full')
-        //     this.onReset()
-        //   })
-        //   .catch(error => {
-        //     console.log(error)
-        //   })
+        axios
+          .post(`http://${process.env.VUE_APP_URL}/product`, data)
+          .then(response => {
+            console.log(response)
+            this.toast2('b-toaster-top-full')
+            this.onReset()
+          })
+          .catch(error => {
+            console.log(error)
+          })
       }
     },
     deliver(param) {
@@ -344,6 +342,9 @@ export default {
 </script>
 
 <style scoped>
+#circle #imageUpload {
+  border-radius: 100%;
+}
 #left {
   margin-bottom: 30px;
 }

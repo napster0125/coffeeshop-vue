@@ -17,25 +17,42 @@ export default {
     },
     resetPage(state) {
       state.page = 1
+    },
+    resetProduct(state) {
+      state.products = []
     }
   },
   actions: {
     getProducts(context, payload) {
       return new Promise((resolve, reject) => {
         if (payload) {
-          axios
-            .get(
-              `http://${process.env.VUE_APP_URL}/product?page=${context.state.page}&limit=${context.state.limit}&category=${payload}`
-            )
-            .then(response => {
-              console.log(response)
-              resolve(response)
-              context.commit('setProduct', response.data)
-            })
-            .catch(error => {
-              console.log(error)
-              reject(error)
-            })
+          if (payload.category) {
+            axios
+              .get(
+                `http://${process.env.VUE_APP_URL}/product?page=${context.state.page}&limit=${context.state.limit}&category=${payload.category}`
+              )
+              .then(response => {
+                console.log(response)
+                resolve(response)
+                context.commit('setProduct', response.data)
+              })
+              .catch(error => {
+                console.log(error)
+                reject(error)
+              })
+          } else if (payload.name) {
+            axios
+              .get(
+                `http://${process.env.VUE_APP_URL}/product?page=${context.state.page}&limit=${context.state.limit}&productName=${payload.name}`
+              )
+              .then(response => {
+                console.log(response)
+                context.commit('setProduct', response.data)
+              })
+              .catch(error => {
+                console.log(error)
+              })
+          }
         } else {
           axios
             .get(
@@ -59,6 +76,19 @@ export default {
           axios
             .get(
               `http://${process.env.VUE_APP_URL}/product?page=${context.state.page}&limit=${context.state.limit}&category=${payload.category}&sort=${payload.sort}`
+            )
+            .then(response => {
+              resolve(response)
+              context.commit('setProduct', response.data)
+            })
+            .catch(error => {
+              console.log(error)
+              reject(error)
+            })
+        } else if (payload.name) {
+          axios
+            .get(
+              `http://${process.env.VUE_APP_URL}/product?page=${context.state.page}&limit=${context.state.limit}&productName=${payload.name}&sort=${payload.sort}`
             )
             .then(response => {
               resolve(response)
