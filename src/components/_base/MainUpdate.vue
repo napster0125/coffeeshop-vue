@@ -190,7 +190,6 @@
 </template>
 
 <script>
-// import axios from 'axios'
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
@@ -264,23 +263,10 @@ export default {
       ) {
         return this.toast2('b-toaster-top-full')
       } else {
-        // this.updateProduct(this.form)
         const param = { form: this.form, id: this.product_id }
-
         this.updateProduct(param)
-        //   axios
-        //     .patch(
-        //       `http://${process.env.VUE_APP_URL}/product/${this.product_id}`,
-        //       data
-        //     )
-        //     .then(response => {
-        //       console.log(response)
         this.toast1('b-toaster-top-full')
         this.$router.go()
-        //     })
-        //     .catch(error => {
-        //       console.log(error)
-        //     })
       }
     },
     toast1(toaster, append = false) {

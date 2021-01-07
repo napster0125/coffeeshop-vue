@@ -183,7 +183,6 @@
 </template>
 
 <script>
-// import axios from 'axios'
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
@@ -220,14 +219,6 @@ export default {
     ...mapGetters(['getDataProductById']),
     getProductById() {
       this.getProductsById(this.product_id)
-      // axios
-      //   .get(`http://${process.env.VUE_APP_URL}/product/${this.product_id}`)
-      //   .then(response => {
-      //     this.products = response.data.data
-      //   })
-      //   .catch(error => {
-      //     console.log(error)
-      //   })
     },
     deleteProduct() {
       this.deletesProduct(this.product_id)
@@ -300,13 +291,6 @@ export default {
 </script>
 
 <style scoped>
-/* main.flex-container {
-  display: flex;
-  margin-top: 150px;
-} */
-/* .kiri {
-  
-} */
 .kiri .top {
   font-family: Rubik;
   font-style: normal;
