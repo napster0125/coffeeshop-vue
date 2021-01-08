@@ -107,23 +107,22 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'coupon',
   data() {
     return {
-      couponArr: 0,
-      couponData: []
+      couponArr: 0
     }
   },
   created() {
     this.getCoupon()
   },
   computed: {
-    ...mapGetters({ user: 'setUser' })
+    ...mapGetters({ user: 'setUser', couponData: 'getDataCoupon' })
   },
   methods: {
+    ...mapActions(['getCoupons', 'deleteCoupons']),
     prevCoupon() {
       this.couponArr -= 1
     },
@@ -131,30 +130,12 @@ export default {
       this.couponArr += 1
     },
     getCoupon() {
-      axios
-        .get(`http://${process.env.VUE_APP_URL}/coupon`)
-        .then(response => {
-          this.couponData = response.data.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.getCoupons()
     },
     deleteCoupon() {
-      axios
-        .delete(
-          `http://${process.env.VUE_APP_URL}/coupon?id=${
-            this.couponData[this.couponArr].coupon_id
-          }`
-        )
-        .then(response => {
-          console.log(response)
-          this.toast3()
-          this.$router.go()
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.deleteCoupons(this.couponArr)
+      this.toast3()
+      this.$router.go()
     },
     updateCoupon(coupon_id) {
       this.$router.push({ name: 'UpdateCoupon', params: { id: coupon_id } })

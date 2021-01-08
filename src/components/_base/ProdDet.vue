@@ -135,7 +135,7 @@
                   >
                 </div>
               </form>
-              <div v-if="role === 1" class="form-row" id="updel">
+              <div v-if="user.user_role === 1" class="form-row" id="updel">
                 <div class="col-6">
                   <button
                     id="update"
@@ -188,7 +188,6 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
   data() {
     return {
-      role: 1,
       product_id: '',
       cart: [],
       form: {
@@ -211,7 +210,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      products: 'getDataProductById'
+      products: 'getDataProductById',
+      user: 'setUser'
     })
   },
   methods: {
@@ -414,6 +414,9 @@ export default {
   padding-bottom: 20px;
   text-align: center;
 }
+#chart {
+  border-radius: 15px;
+}
 .line4 form .bot a,
 .line4 form .bot a:visited {
   width: 100%;
@@ -426,6 +429,7 @@ export default {
   font-size: 23px;
   height: 80%;
   text-align: center;
+  border-radius: 15px;
 }
 .line4 form .bot a:hover {
   color: black;

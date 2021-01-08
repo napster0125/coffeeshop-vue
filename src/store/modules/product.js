@@ -204,7 +204,11 @@ export default {
         data.append('deliver_id', deliver_id)
         data.append('size_id', size_id)
         data.append('fav', fav)
-
+        // for (var pair of data.entries()) {
+        //   console.log(pair[0] + ', ' + pair[1])
+        // }
+        // console.log(resolve)
+        // console.log(reject)
         axios
           .patch(
             `http://${process.env.VUE_APP_URL}/product/${payload.id}`,

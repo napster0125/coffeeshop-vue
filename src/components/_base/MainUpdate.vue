@@ -177,7 +177,6 @@
             </button>
             <br />
             <br />
-            {{ form }}
             <br />
             <router-link to="/product">
               <button id="buttonCancel">Cancel</button>
@@ -198,7 +197,8 @@ export default {
       product_id: '',
       home: 0,
       dine: 0,
-      take: 0
+      take: 0,
+      url: null
     }
   },
   computed: {
@@ -231,9 +231,7 @@ export default {
     },
     handleFile(event) {
       this.form.product_image = event.target.files[0]
-      this.url = URL.createObjectURL(
-        (this.form.product_image = event.target.files[0])
-      )
+      this.url = URL.createObjectURL(event.target.files[0])
       const type = event.target.files[0].type
       if (type != 'image/jpeg' && type != 'image/png' && type != 'image/jpg') {
         return this.toast3('b-toaster-top-full')

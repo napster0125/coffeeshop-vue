@@ -3,7 +3,7 @@
     <b-container fluid class="centered">
       <Navbar />
       <div id="main">
-        <div id="welcome" v-show="rule === 1">
+        <div id="welcome" v-show="user.user_role === 1">
           Welcome to Coffee-Shop, Admin
           <br />
           <br />
@@ -15,7 +15,7 @@
             <button>Post a Coupon</button>
           </router-link>
         </div>
-        <div id="welcome" v-show="rule != 1">
+        <div id="welcome" v-show="user.user_role !== 1">
           Welcome to Coffee-Shop, User <br />
           <br />
           <button>Check Today's Favourite</button> <br />
@@ -39,11 +39,11 @@ export default {
     Navbar,
     Footer
   },
-  data() {
-    return {
-      rule: 1
-    }
-  },
+  // data() {
+  //   return {
+  //     rule: 1
+  //   }
+  // },
   computed: {
     ...mapGetters({ user: 'setUser' })
   }
