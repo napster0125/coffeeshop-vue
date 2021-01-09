@@ -3,13 +3,26 @@
     <b-container fluid>
       <b-row>
         <b-col xl="4" md="6" id="left">
-          <div id="circle"><img src="@/assets/photoGrey.png" /></div>
+          <div id="circle">
+            <img v-if="!form.coupon_image" src="@/assets/photoGrey.png" />
+            <img id="imageUpload" v-if="form.coupon_image" :src="url" />
+          </div>
           <div id="top">
             <b-button block size="lg" variant="dark">Take A Picture</b-button>
             <br />
-            <b-button block size="lg" variant="warning"
+            <b-button @click="chooseFile()" block size="lg" variant="warning"
               >Choose from Gallery</b-button
             >
+            <br />
+            <div>
+              <input
+                id="formInputImage"
+                type="file"
+                accept="image/x-png,image/jpg,image/jpeg"
+                @change="handleFile"
+                hidden
+              />
+            </div>
             <div id="delivery">
               <b>Expire Date : </b><br />
               <br />
@@ -165,7 +178,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions } from 'vuex'
+
 export default {
   data() {
     return {
@@ -179,6 +193,7 @@ export default {
         coupon_discount: null,
         size_id: 1,
         deliver_id: 0,
+        coupon_image: null,
         home: 0,
         dine: 0,
         take: 0
@@ -186,6 +201,20 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['uploadCoupon']),
+    chooseFile() {
+      document.getElementById('formInputImage').click()
+    },
+    handleFile(event) {
+      this.form.coupon_image = event.target.files[0]
+      this.url = URL.createObjectURL(
+        (this.form.coupon_image = event.target.files[0])
+      )
+      const type = event.target.files[0].type
+      if (type != 'image/jpeg' && type != 'image/png' && type != 'image/jpg') {
+        return this.toast3('b-toaster-top-full')
+      }
+    },
     postProduct() {
       const discount = parseInt(this.form.coupon_discount)
       if (
@@ -195,22 +224,16 @@ export default {
         !this.form.coupon_price ||
         !this.form.coupon_code ||
         !this.form.coupon_discount ||
-        !this.form.deliver_id
+        !this.form.deliver_id ||
+        !this.form.coupon_image
       ) {
-        return alert('Please input all data')
+        return this.toast1('b-toaster-top-full')
       } else if (discount > 99) {
         return alert("Coupon discount (%) can't exceed 99%")
       } else {
-        axios
-          .post(`http://${process.env.VUE_APP_URL}/coupon`, this.form)
-          .then(response => {
-            console.log(response)
-            alert('Success Post new coupon')
-          })
-          .catch(error => {
-            console.log(error)
-            alert(error)
-          })
+        this.uploadCoupon(this.form)
+        this.toast2('b-toaster-top-full')
+        this.onReset()
       }
     },
     onReset() {
@@ -270,6 +293,33 @@ export default {
       } else {
         this.form.deliver_id = 0
       }
+    },
+    toast1(toaster, append = false) {
+      this.$bvToast.toast('Please Input All data', {
+        title: 'Warning',
+        toaster: toaster,
+        solid: true,
+        variant: 'warning',
+        appendToast: append
+      })
+    },
+    toast2(toaster, append = false) {
+      this.$bvToast.toast('Coupon created successfully', {
+        title: 'Success',
+        toaster: toaster,
+        solid: true,
+        variant: 'success',
+        appendToast: append
+      })
+    },
+    toast3(toaster, append = false) {
+      this.$bvToast.toast('Uploaded picture must be PNG or JPEG format', {
+        title: 'Warning',
+        toaster: toaster,
+        solid: true,
+        variant: 'warning',
+        appendToast: append
+      })
     }
   }
 }
