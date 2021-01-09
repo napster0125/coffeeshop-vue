@@ -163,7 +163,11 @@
             </button>
           </div>
 
-          <b-form id="input5" @submit="postProduct" @reset.prevent="onReset">
+          <b-form
+            id="input5"
+            @submit.prevent="postProduct"
+            @reset.prevent="onReset"
+          >
             <button type="submit" id="buttonSave">
               Create Coupon
             </button>

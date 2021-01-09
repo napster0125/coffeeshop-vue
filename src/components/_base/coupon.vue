@@ -14,7 +14,16 @@
         <div class="rec2"></div>
         <div class="rec1">
           <div class="top">
-            <div class="one"><img src="@/assets/img29.png" /></div>
+            <div class="one">
+              <img
+                :src="
+                  !couponData[couponArr].coupon_image
+                    ? 'http://localhost:3000/product/cold.png'
+                    : 'http://localhost:3000/coupon/' +
+                      couponData[couponArr].coupon_image
+                "
+              />
+            </div>
             <div class="two">
               <div class="atas">
                 {{ couponData[couponArr].coupon_name }}
@@ -235,6 +244,11 @@ export default {
   margin-top: 50px;
   margin-left: 75px;
   border-radius: 50%;
+}
+.one img {
+  object-fit: cover;
+  width: 110px;
+  height: 110px;
 }
 .top .two {
   font-family: Poppins;

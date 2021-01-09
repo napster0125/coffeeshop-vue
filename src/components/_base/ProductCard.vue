@@ -183,6 +183,7 @@ export default {
   border: black 2px solid;
 }
 #productCard img {
+  object-fit: cover;
   position: relative;
   left: 0;
   top: -50px;

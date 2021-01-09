@@ -383,6 +383,7 @@ export default {
   margin-top: 50px;
 }
 #circle img.imgUpload {
+  object-fit: cover;
   border-radius: 100%;
   width: 200px;
   height: 200px;
