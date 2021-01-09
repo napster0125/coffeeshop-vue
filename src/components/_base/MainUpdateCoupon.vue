@@ -3,11 +3,27 @@
     <b-container fluid>
       <b-row>
         <b-col xl="4" md="6" id="left">
-          <div id="circle"><img src="@/assets/photoGrey.png" /></div>
+          <div id="circle">
+            <img v-if="!form.coupon_image" src="@/assets/photoGrey.png" />
+            <img
+              id="imageUploads"
+              class="imgUpload"
+              v-if="form.coupon_image && !url"
+              :src="'http://localhost:3000/coupon/' + form.coupon_image"
+            />
+            <img id="imageUpload" class="imgUpload" v-if="url" :src="url" />
+            <input
+              id="formInputImage"
+              type="file"
+              accept="image/x-png,image/jpg,image/jpeg"
+              @change="handleFile"
+              hidden
+            />
+          </div>
           <div id="top">
             <b-button block size="lg" variant="dark">Take A Picture</b-button>
             <br />
-            <b-button block size="lg" variant="warning"
+            <b-button @click="chooseFile()" block size="lg" variant="warning"
               >Choose from Gallery</b-button
             >
             <div id="delivery">
@@ -132,35 +148,33 @@
             <p>Click methods you want to use for this product</p>
             <button
               v-on:click="deliver(1)"
-              v-bind:class="this.form.home == 1 ? 'yellow' : 'normal'"
+              v-bind:class="this.home == 1 ? 'yellow' : 'normal'"
             >
               Home Delivery
             </button>
             <button
               v-on:click="deliver(2)"
-              v-bind:class="this.form.dine == 1 ? 'yellow' : 'normal'"
+              v-bind:class="this.dine == 1 ? 'yellow' : 'normal'"
             >
               Dine In
             </button>
             <button
               v-on:click="deliver(3)"
-              v-bind:class="this.form.take == 1 ? 'yellow' : 'normal'"
+              v-bind:class="this.take == 1 ? 'yellow' : 'normal'"
             >
               Take Away
             </button>
           </div>
 
-          <b-form
-            id="input5"
-            @submit.prevent="updateCoupon"
-            @reset.prevent="onReset"
-          >
+          <b-form id="input5" @submit.prevent="updateCoupon">
             <button type="submit" id="buttonSave">
               Update Coupon
             </button>
             <br />
             <br />
-            <button id="buttonCancel" type="reset">Reset</button>
+            <router-link to="/product">
+              <button id="buttonCancel">Cancel</button>
+            </router-link>
           </b-form>
         </b-col>
       </b-row>
@@ -169,62 +183,58 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   data() {
     return {
       coupon_id: '',
-      coupon: [{}],
-      form: {
-        coupon_name: '',
-        start_date: null,
-        end_date: null,
-        coupon_price: null,
-        coupon_code: null,
-        coupon_desc: '',
-        coupon_discount: null,
-        size_id: 1,
-        home: 0,
-        dine: 0,
-        take: 0,
-        deliver_id: 0
-      }
+      url: null,
+      home: 0,
+      dine: 0,
+      take: 0
     }
+  },
+  computed: {
+    ...mapGetters({
+      coupon: 'getDataCouponById',
+      form: 'getFormIdCoupon'
+    })
   },
   created() {
     this.coupon_id = this.$route.params.id
     this.getCouponById()
   },
   methods: {
+    ...mapActions(['getCouponsById', 'updateCoupons']),
+    ...mapGetters(['getDataCouponById', 'getFormIdCoupon']),
+
+    chooseFile() {
+      document.getElementById('formInputImage').click()
+    },
+    handleFile(event) {
+      this.form.coupon_image = event.target.files[0]
+      this.url = URL.createObjectURL(
+        (this.form.coupon_image = event.target.files[0])
+      )
+      const type = event.target.files[0].type
+      if (type != 'image/jpeg' && type != 'image/png' && type != 'image/jpg') {
+        return this.toast3('b-toaster-top-full')
+      }
+    },
     getCouponById() {
-      axios
-        .get(`http://${process.env.VUE_APP_URL}/coupon/${this.coupon_id}`)
-        .then(response => {
-          this.coupon = response.data.data
-          this.form.coupon_name = this.coupon[0].coupon_name
-          this.form.start_date = this.coupon[0].start_date
-          this.form.end_date = this.coupon[0].end_date
-          this.form.coupon_price = this.coupon[0].coupon_price
-          this.form.coupon_code = this.coupon[0].coupon_code
-          this.form.coupon_desc = this.coupon[0].coupon_desc
-          this.form.size_id = this.coupon[0].size_id
-          this.form.deliver_id = this.coupon[0].deliver_id
-          this.form.coupon_discount = this.coupon[0].coupon_discount
-          // deliver handling ===================
-          const deliv = this.form.deliver_id
-          if (deliv == 1 || deliv == 4 || deliv == 5 || deliv == 7) {
-            this.form.home = 1
-          }
-          if (deliv == 2 || deliv == 4 || deliv == 6 || deliv == 7) {
-            this.form.dine = 1
-          }
-          if (deliv == 3 || deliv == 5 || deliv == 6 || deliv == 7) {
-            this.form.take = 1
-          }
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.getCouponsById(this.coupon_id)
+      // deliver handling ===================
+      const deliv = this.form.deliver_id
+      if (deliv == 1 || deliv == 4 || deliv == 5 || deliv == 7) {
+        this.home = 1
+      }
+      if (deliv == 2 || deliv == 4 || deliv == 6 || deliv == 7) {
+        this.dine = 1
+      }
+      if (deliv == 3 || deliv == 5 || deliv == 6 || deliv == 7) {
+        this.take = 1
+      }
     },
     updateCoupon() {
       const discount = parseInt(this.form.coupon_discount)
@@ -235,25 +245,17 @@ export default {
         !this.form.coupon_price ||
         !this.form.coupon_code ||
         !this.form.coupon_discount ||
-        !this.form.deliver_id
+        !this.form.deliver_id ||
+        !this.form.coupon_image
       ) {
         return this.toast2('b-toaster-top-full')
       } else if (discount > 99) {
         this.toast3('b-toaster-top-full')
       } else {
-        axios
-          .patch(
-            `http://${process.env.VUE_APP_URL}/coupon?id=${this.coupon_id}`,
-            this.form
-          )
-          .then(response => {
-            console.log(response)
-            this.toast1('b-toaster-top-full')
-            this.$router.go()
-          })
-          .catch(error => {
-            console.log(error)
-          })
+        const param = { form: this.form, id: this.coupon_id }
+        this.updateCoupons(param)
+        this.toast1('b-toaster-top-full')
+        this.$router.go()
       }
     },
     toast1(toaster, append = false) {
@@ -283,39 +285,24 @@ export default {
         appendToast: append
       })
     },
-    onReset() {
-      this.form = {
-        coupon_name: '',
-        start_date: null,
-        end_date: null,
-        coupon_price: null,
-        coupon_code: null,
-        coupon_desc: '',
-        size_id: 1,
-        deliver_id: 0,
-        home: 0,
-        dine: 0,
-        take: 0
-      }
-    },
     deliver(param) {
       if (param == 1) {
-        if (this.form.home == 0) {
-          this.form.home = 1
+        if (this.home == 0) {
+          this.home = 1
         } else {
-          this.form.home = 0
+          this.home = 0
         }
       } else if (param == 2) {
-        if (this.form.dine == 0) {
-          this.form.dine = 1
+        if (this.dine == 0) {
+          this.dine = 1
         } else {
-          this.form.dine = 0
+          this.dine = 0
         }
       } else if (param == 3) {
-        if (this.form.take == 0) {
-          this.form.take = 1
+        if (this.take == 0) {
+          this.take = 1
         } else {
-          this.form.take = 0
+          this.take = 0
         }
       } else {
         console.log(param)
@@ -323,19 +310,19 @@ export default {
       this.calculateDeliver()
     },
     calculateDeliver() {
-      if (this.form.take && this.form.dine && this.form.home) {
+      if (this.take && this.dine && this.home) {
         this.form.deliver_id = 7
-      } else if (this.form.take && this.form.dine) {
+      } else if (this.take && this.dine) {
         this.form.deliver_id = 6
-      } else if (this.form.take && this.form.home) {
+      } else if (this.take && this.home) {
         this.form.deliver_id = 5
-      } else if (this.form.home && this.form.dine) {
+      } else if (this.home && this.dine) {
         this.form.deliver_id = 4
-      } else if (this.form.take) {
+      } else if (this.take) {
         this.form.deliver_id = 3
-      } else if (this.form.dine) {
+      } else if (this.dine) {
         this.form.deliver_id = 2
-      } else if (this.form.home) {
+      } else if (this.home) {
         this.form.deliver_id = 1
       } else {
         this.form.deliver_id = 0
